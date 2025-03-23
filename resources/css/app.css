@@ -1,3 +1,11 @@
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    overflow-y: scroll;
+}
+
+nav.fi-tabs[role="tablist"] {
+    flex-wrap: wrap;
+    justify-content: center;
+}
