@@ -2,10 +2,11 @@
 
 namespace App\Filament\Clusters\Management\Resources\OrganizationResource\Pages;
 
+use Filament\Actions\CreateAction;
+use Filament\Schemas\Components\Tabs\Tab;
 use App\Filament\Clusters\Management\Resources\OrganizationResource;
 use App\Models\Organization;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -16,7 +17,7 @@ class ListOrganizations extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 

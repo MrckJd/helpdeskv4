@@ -2,6 +2,8 @@
 
 namespace App\Filament\Actions\Tables;
 
+use Filament\Actions\Action;
+use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Enums\UserRole;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
@@ -10,8 +12,6 @@ use App\Models\Request;
 use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\MarkdownEditor;
-use Filament\Support\Enums\MaxWidth;
-use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class RequeueRequestAction extends Action
@@ -36,7 +36,7 @@ class RequeueRequestAction extends Action
 
         $this->modalDescription('Please provide a valid reason for rejecting and requeueing this request.');
 
-        $this->modalWidth(MaxWidth::ExtraLarge);
+        $this->modalWidth(Width::ExtraLarge);
 
         $this->successNotificationTitle('Request rejected and requeued');
 
@@ -45,7 +45,7 @@ class RequeueRequestAction extends Action
         $this->form([
             MarkdownEditor::make('remarks')
                 ->label('Reason')
-                ->required(Filament::getCurrentPanel()->getId() === 'agent'),
+                ->required(Filament::getCurrentOrDefaultPanel()->getId() === 'agent'),
             FileAttachment::make(),
         ]);
 

@@ -2,16 +2,25 @@
 
 namespace App\Filament\Clusters\Management\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Placeholder;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\EditAction;
+use Filament\Support\Enums\Width;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
 use App\Filament\Clusters\Management;
 use App\Filament\Clusters\Management\Resources\TagResource\Pages\ListTags;
 use App\Filament\Filters\OrganizationFilter;
 use App\Models\Tag;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,22 +33,22 @@ class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
 
-    protected static ?string $navigationIcon = 'gmdi-sell-o';
+    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-sell-o';
 
     protected static ?string $cluster = Management::class;
 
     public static function canAccess(): bool
     {
-        return in_array(Filament::getCurrentPanel()->getId(), ['root', 'admin']);
+        return in_array(Filament::getCurrentOrDefaultPanel()->getId(), ['root', 'admin']);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        $panel = Filament::getCurrentPanel()->getId();
+        $panel = Filament::getCurrentOrDefaultPanel()->getId();
 
-        return $form
-            ->schema([
-                Forms\Components\Select::make('organization_id')
+        return $schema
+            ->components([
+                Select::make('organization_id')
                     ->columnSpanFull()
                     ->relationship('organization', 'code')
                     ->searchable()
@@ -47,21 +56,21 @@ class TagResource extends Resource
                     ->required()
                     ->placeholder('Select organization')
                     ->visible(fn (string $operation) => $panel === 'root' && $operation === 'create'),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->maxLength(24)
                     ->columnSpanFull()
                     ->live(debounce: 250)
                     ->rules('required')
                     ->markAsRequired()
                     ->unique(ignoreRecord: true, modifyRuleUsing: fn ($get, $rule) => $rule->where('organization_id', $get('organization_id'))),
-                Forms\Components\Select::make('color')
+                Select::make('color')
                     ->columnSpanFull()
                     ->options(array_reverse(array_combine(array_keys(Color::all()), array_map('ucfirst', array_keys(Color::all())))))
                     ->default('gray')
                     ->live(debounce: 250)
                     ->searchable()
                     ->required(),
-                Forms\Components\Placeholder::make('preview')
+                Placeholder::make('preview')
                     ->columnSpanFull()
                     ->extraAttributes(['class' => 'w-fit'])
                     ->content(fn ($get) => new HtmlString(Blade::render(
@@ -72,33 +81,33 @@ class TagResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $panel = Filament::getCurrentPanel()->getId();
+        $panel = Filament::getCurrentOrDefaultPanel()->getId();
 
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->label('Tag')
                     ->color(fn (Tag $tag) => $tag->color ?? 'gray')
                     ->badge()
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('organization.code')
+                TextColumn::make('organization.code')
                     ->visible($panel === 'root')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('requests_count')
+                TextColumn::make('requests_count')
                     ->label('Requests')
                     ->counts('requests'),
-                Tables\Columns\TextColumn::make('open_count')
+                TextColumn::make('open_count')
                     ->label('Open')
                     ->counts('open'),
-                Tables\Columns\TextColumn::make('closed_count')
+                TextColumn::make('closed_count')
                     ->label('Closed')
                     ->counts('closed'),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -108,14 +117,14 @@ class TagResource extends Resource
                     ->withUnaffiliated(false)
                     ->visible($panel === 'root'),
             ])
-            ->actions([
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\EditAction::make()
+            ->recordActions([
+                RestoreAction::make(),
+                EditAction::make()
                     ->slideOver()
-                    ->modalWidth(MaxWidth::Large),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
-                    Tables\Actions\ForceDeleteAction::make(),
+                    ->modalWidth(Width::Large),
+                ActionGroup::make([
+                    DeleteAction::make(),
+                    ForceDeleteAction::make(),
                 ]),
             ])
             ->recordAction(null)
@@ -136,7 +145,7 @@ class TagResource extends Resource
                 SoftDeletingScope::class,
             ]);
 
-        match (Filament::getCurrentPanel()->getId()) {
+        match (Filament::getCurrentOrDefaultPanel()->getId()) {
             'root' => $query,
             'admin' => $query->where('organization_id', Auth::user()->organization_id),
             default => $query->whereRaw('1 = 0'),

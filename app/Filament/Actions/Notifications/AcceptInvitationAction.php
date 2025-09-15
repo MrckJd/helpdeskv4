@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions\Notifications;
 
+use Filament\Actions\Action;
 use App\Models\User;
-use Filament\Notifications\Actions\Action;
 
 class AcceptInvitationAction extends Action
 {

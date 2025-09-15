@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions\Concerns;
 
+use Filament\Support\Enums\Width;
 use App\Enums\UserRole;
 use App\Filament\Actions\Notifications\AcceptInvitationAction;
 use App\Models\Organization;
@@ -15,7 +16,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\Alignment;
-use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 
@@ -31,7 +31,7 @@ trait InviteUser
 
         $this->modalIcon('gmdi-person-add-o');
 
-        $this->modalWidth(MaxWidth::Large);
+        $this->modalWidth(Width::Large);
 
         $this->modalFooterActionsAlignment(Alignment::Right);
 
@@ -76,7 +76,7 @@ trait InviteUser
                 ->options(Organization::pluck('name', 'id'))
                 ->required()
                 ->searchable()
-                ->visible(Filament::getCurrentPanel()->getId() === 'root')
+                ->visible(Filament::getCurrentOrDefaultPanel()->getId() === 'root')
                 ->placeholder('Select an organization'),
         ]);
 
@@ -134,4 +134,10 @@ trait InviteUser
             ->body("A user can only recieve an invitation once a day per organization. Please try again within {$next}.")
             ->danger();
     }
+    public function rateLimit(int|\Closure|null $maxAttempts): static
+    {
+        $this->rateLimit = $maxAttempts;
+        return $this;
+    }
+
 }

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions\Tables;
 
+use Filament\Actions\DeleteAction;
 use App\Filament\Actions\Concerns\DeleteRequest;
-use Filament\Tables\Actions\DeleteAction;
 
 class DeleteRequestAction extends DeleteAction
 {

@@ -2,23 +2,22 @@
 
 namespace App\Filament\Panels\Auth\Pages;
 
+use Filament\Schemas\Components\Component;
 use App\Http\Responses\LoginResponse;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Models\Contracts\FilamentUser;
-use Filament\Pages\Auth\Login as LoginPage;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 
-class Login extends LoginPage
+class Login extends \Filament\Auth\Pages\Login
 {
     protected static string $layout = 'filament-panels::components.layout.base';
 
-    protected static string $view = 'filament.panels.auth.pages.login';
+    protected string $view = 'filament.panels.auth.pages.login';
 
     public function authenticate(): ?LoginResponse
     {
@@ -39,7 +38,7 @@ class Login extends LoginPage
         /** @var User */
         $user = Filament::auth()->user();
 
-        if (($user instanceof FilamentUser && ! $user->canAccessPanel(Filament::getCurrentPanel()))) {
+        if (($user instanceof FilamentUser && ! $user->canAccessPanel(Filament::getCurrentOrDefaultPanel()))) {
             Filament::auth()->logout();
 
             $this->throwFailureValidationException();

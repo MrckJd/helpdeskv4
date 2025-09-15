@@ -2,13 +2,13 @@
 
 namespace App\Filament\Actions\Tables;
 
+use Filament\Actions\ActionGroup;
+use Filament\Actions\Action;
+use Filament\Support\Enums\Width;
 use App\Enums\RequestClass;
 use App\Models\Subcategory;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\Alignment;
-use Filament\Support\Enums\MaxWidth;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
 
 class TemplatesPreviewActionGroup extends ActionGroup
 {
@@ -38,7 +38,7 @@ class TemplatesPreviewActionGroup extends ActionGroup
             ->modalFooterActionsAlignment(Alignment::End)
             ->modalSubmitAction(false)
             ->modalCancelActionLabel('Close')
-            ->modalWidth(MaxWidth::ExtraLarge)->infolist(fn (Subcategory $subcategory) => [
+            ->modalWidth(Width::ExtraLarge)->schema(fn (Subcategory $subcategory) => [
                 TextEntry::make('preview')
                     ->hiddenLabel()
                     ->extraEntryWrapperAttributes(['class' => 'w-full'])

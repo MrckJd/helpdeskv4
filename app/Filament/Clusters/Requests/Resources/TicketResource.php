@@ -2,6 +2,8 @@
 
 namespace App\Filament\Clusters\Requests\Resources;
 
+use Filament\Actions\ActionGroup;
+use Filament\Actions\ForceDeleteAction;
 use App\Enums\RequestClass;
 use App\Enums\UserRole;
 use App\Filament\Actions\Tables\AssignRequestAction;
@@ -24,8 +26,6 @@ use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListTickets;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\NewTicket;
 use App\Filament\Resources\RequestResource;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\ForceDeleteAction;
 use Illuminate\Support\Facades\Auth;
 
 class TicketResource extends RequestResource
@@ -36,7 +36,7 @@ class TicketResource extends RequestResource
 
     protected static ?int $navigationSort = -2;
 
-    protected static ?string $navigationIcon = 'heroicon-o-ticket';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-ticket';
 
     protected static ?string $label = 'Tickets';
 

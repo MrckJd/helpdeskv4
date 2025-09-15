@@ -2,6 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\Verify;
+use App\Http\Middleware\Approve;
+use App\Http\Middleware\Active;
+use App\Http\Middleware\Initialize;
+use Illuminate\Routing\Controllers\Middleware;
+use Closure;
 use App\Models\Attachment;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
@@ -12,16 +19,16 @@ class AttachmentController extends Controller implements HasMiddleware
     /**
      * Get the middleware that should be assigned to the controller.
      *
-     * @return array<int,\Illuminate\Routing\Controllers\Middleware|\Closure|string>
+     * @return array<int, Middleware|Closure|string>
      */
     public static function middleware(): array
     {
         return [
-            \App\Http\Middleware\Authenticate::class,
-            \App\Http\Middleware\Verify::class,
-            \App\Http\Middleware\Approve::class,
-            \App\Http\Middleware\Active::class,
-            \App\Http\Middleware\Initialize::class,
+            Authenticate::class,
+            Verify::class,
+            Approve::class,
+            Active::class,
+            Initialize::class,
         ];
     }
 

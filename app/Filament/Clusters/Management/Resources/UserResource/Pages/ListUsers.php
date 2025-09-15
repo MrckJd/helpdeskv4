@@ -2,10 +2,10 @@
 
 namespace App\Filament\Clusters\Management\Resources\UserResource\Pages;
 
+use Filament\Schemas\Components\Tabs\Tab;
 use App\Filament\Actions\InviteUserAction;
 use App\Filament\Clusters\Management\Resources\UserResource;
 use Filament\Facades\Filament;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -22,7 +22,7 @@ class ListUsers extends ListRecords
 
     public function getTabs(): array
     {
-        $panel = Filament::getCurrentPanel()->getId();
+        $panel = Filament::getCurrentOrDefaultPanel()->getId();
 
         $query = fn () => static::$resource::getEloquentQuery();
 

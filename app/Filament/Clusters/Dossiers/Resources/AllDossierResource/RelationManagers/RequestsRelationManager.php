@@ -2,6 +2,11 @@
 
 namespace App\Filament\Clusters\Dossiers\Resources\AllDossierResource\RelationManagers;
 
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\AttachAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DetachAction;
+use Filament\Actions\DetachBulkAction;
 use App\Enums\ActionStatus;
 use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
@@ -27,37 +32,37 @@ class RequestsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('code')
             ->columns([
-                Tables\Columns\TextColumn::make('action.status')
+                TextColumn::make('action.status')
                     ->label('Status')
                     ->badge()
                     ->state(fn (Request $request) => $request->action->status === ActionStatus::CLOSED ? $request->action->resolution : $request->action->status),
-                Tables\Columns\TextColumn::make('code')
+                TextColumn::make('code')
                     ->extraCellAttributes(['class' => 'font-mono'])
                     ->getStateUsing(fn (Request $request) => "#{$request->code}")
                     ->searchable(),
-                Tables\Columns\TextColumn::make('subject')
+                TextColumn::make('subject')
                     ->searchable(),
             ])
             ->headerActions([
-                Tables\Actions\AttachAction::make()
+                AttachAction::make()
                     ->label('Add request')
                     ->attachAnother(false)
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['code', 'subject'])
                     ->mutateFormDataUsing(fn (array $data) => [...$data, 'user_id' => Auth::id()]),
             ])
-            ->actions([
+            ->recordActions([
                 ShowRequestAction::make(),
                 ViewRequestHistoryAction::make(),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DetachAction::make()
+                ActionGroup::make([
+                    DetachAction::make()
                         ->label('Remove')
                         ->modalHeading('Remove request from dossier')
                         ->modalDescription('Are you sure you want to remove this request from this dossier?'),
                 ]),
             ])
-            ->bulkActions([
-                Tables\Actions\DetachBulkAction::make()
+            ->toolbarActions([
+                DetachBulkAction::make()
                     ->label('Remove')
                     ->modalHeading('Remove selected requests from dossier')
                     ->modalDescription('Are you sure you want to remove these selected requests from this dossier?'),
