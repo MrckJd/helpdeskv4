@@ -2,16 +2,15 @@
 
 namespace App\Filament\Concerns;
 
-use Filament\Schemas\Components\Tabs\Tab;
-use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use Filament\Facades\Filament;
+use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * @mixin ListInquiries
+ * @mixin \App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries
  * @mixin \App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\ListInquiries
  * @mixin \App\Filament\Clusters\Personal\Resources\RequestResource\Pages\ListInquiries
  */
@@ -19,7 +18,7 @@ trait HasTicketTabs
 {
     public function getTabs(): array
     {
-        $panel = Filament::getCurrentOrDefaultPanel()->getId();
+        $panel = Filament::getCurrentPanel()->getId();
 
         $inbound = static::getResource()::$inbound;
 

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Clusters\Management\Resources\OrganizationResource\Pages;
 
-use Filament\Actions\DeleteAction;
 use App\Filament\Clusters\Management\Resources\OrganizationResource;
 use Filament\Actions;
 use Filament\Actions\Action;
@@ -15,11 +14,11 @@ class EditOrganization extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('back')
+            Actions\Action::make('back')
                 ->color('gray')
                 ->icon('heroicon-o-arrow-left')
                 ->url(static::$resource::getUrl()),
-            DeleteAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 

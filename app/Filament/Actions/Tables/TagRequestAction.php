@@ -2,14 +2,14 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Models\Request;
 use App\Models\Tag;
 use Exception;
 use Filament\Forms\Components\Select;
 use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class TagRequestAction extends Action
@@ -28,7 +28,7 @@ class TagRequestAction extends Action
 
         $this->modalIcon(ActionStatus::TAGGED->getIcon());
 
-        $this->modalWidth(Width::Small);
+        $this->modalWidth(MaxWidth::Small);
 
         $this->modalAlignment(Alignment::Left);
 

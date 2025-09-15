@@ -8,5 +8,5 @@ class Dossiers extends Cluster
 {
     protected static ?int $navigationSort = 2;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-library-books-o';
+    protected static ?string $navigationIcon = 'gmdi-library-books-o';
 }

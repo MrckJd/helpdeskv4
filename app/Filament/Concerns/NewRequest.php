@@ -2,9 +2,6 @@
 
 namespace App\Filament\Concerns;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Group;
-use RuntimeException;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
@@ -13,9 +10,11 @@ use App\Models\Organization;
 use App\Models\Request;
 use App\Models\Subcategory;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Concerns\EvaluatesClosures;
 use Filament\Support\Facades\FilamentView;
@@ -55,7 +54,7 @@ trait NewRequest
         return str($heading)->toHtmlString();
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
         $classification = static::getClassification();
 
@@ -68,10 +67,10 @@ trait NewRequest
                     ->toArray(),
             ]);
 
-        return $schema
+        return $form
             ->columns(12)
             ->model(Request::class)
-            ->components([
+            ->schema([
                 Group::make()
                     ->columnSpan(11)
                     ->schema([
@@ -102,10 +101,10 @@ trait NewRequest
                         MarkdownEditor::make('body')
                             ->required()
                             ->hintAction(
-                                Action::make('preview')
+                                \Filament\Forms\Components\Actions\Action::make('preview')
                                     ->modalSubmitAction(false)
                                     ->modalCancelActionLabel('Close')
-                                    ->schema(fn ($state) => [
+                                    ->infolist(fn ($state) => [
                                         TextEntry::make('preview')
                                             ->hiddenLabel()
                                             ->state(fn () => $state)
@@ -124,7 +123,7 @@ trait NewRequest
 
     protected static function getClassification(): RequestClass
     {
-        return static::$classification ?? throw new RuntimeException('Classification not set.');
+        return static::$classification ?? throw new \RuntimeException('Classification not set.');
     }
 
     protected function mutateFormDataBeforeSave(array $data): array

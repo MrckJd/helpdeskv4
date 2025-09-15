@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
 use App\Filament\Actions\Concerns\DeactivateAccess;
+use Filament\Tables\Actions\Action;
 
 class DeactivateAccessAction extends Action
 {

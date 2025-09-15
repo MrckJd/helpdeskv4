@@ -2,9 +2,9 @@
 
 namespace App\Filament\Forms;
 
-use Filament\Schemas\Components\Section;
 use App\Models\Attachment;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Section;
 use Illuminate\Database\Eloquent\Model;
 
 class FileAttachment extends Section

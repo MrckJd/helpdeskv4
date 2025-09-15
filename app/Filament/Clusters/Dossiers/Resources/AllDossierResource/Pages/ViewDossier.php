@@ -2,11 +2,6 @@
 
 namespace App\Filament\Clusters\Dossiers\Resources\AllDossierResource\Pages;
 
-use Filament\Actions\RestoreAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
 use App\Filament\Actions\NoteDossierAction;
 use App\Filament\Clusters\Dossiers\Resources\AllDossierResource;
 use Filament\Actions;
@@ -40,19 +35,19 @@ class ViewDossier extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            RestoreAction::make()
+            Actions\RestoreAction::make()
                 ->label('Restore')
                 ->modalHeading('Restore dossier'),
             NoteDossierAction::make()
                 ->icon(null),
-            EditAction::make()
+            Actions\EditAction::make()
                 ->label('Edit')
                 ->hidden($this->record->trashed())
                 ->slideOver(),
-            ActionGroup::make([
-                DeleteAction::make()
+            Actions\ActionGroup::make([
+                Actions\DeleteAction::make()
                     ->modalHeading('Delete dossier'),
-                ForceDeleteAction::make()
+                Actions\ForceDeleteAction::make()
                     ->modalHeading('Force delete dossier'),
             ]),
         ];

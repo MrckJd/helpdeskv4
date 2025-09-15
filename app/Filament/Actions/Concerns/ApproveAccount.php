@@ -2,14 +2,14 @@
 
 namespace App\Filament\Actions\Concerns;
 
-use Filament\Actions\BulkAction;
-use Filament\Actions\Action;
 use App\Enums\UserRole;
 use App\Models\Organization;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -46,7 +46,7 @@ trait ApproveAccount
                 ->searchable()
                 ->required()
                 ->noSearchResultsMessage('No organizations found.')
-                ->visible(fn () => Filament::getCurrentOrDefaultPanel()->getId() === 'root'),
+                ->visible(fn () => Filament::getCurrentPanel()->getId() === 'root'),
             Select::make('role')
                 ->options(UserRole::class)
                 ->default($this instanceof Action ? $user->role?->value : null)
@@ -75,7 +75,7 @@ trait ApproveAccount
 
             default:
                 $this->action(function (User $user, array $data) {
-                    $organization = match (Filament::getCurrentOrDefaultPanel()->getId()) {
+                    $organization = match (Filament::getCurrentPanel()->getId()) {
                         'root' => $data['organization_id'],
                         default => $user->organization_id,
                     };

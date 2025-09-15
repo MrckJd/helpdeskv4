@@ -21,7 +21,7 @@ class Deactivated extends SimplePage implements HasMiddleware
 
     protected static string $layout = 'filament-panels::components.layout.base';
 
-    protected string $view = 'filament.panels.auth.pages.deactivated';
+    protected static string $view = 'filament.panels.auth.pages.deactivated';
 
     public static function getSlug(): string
     {

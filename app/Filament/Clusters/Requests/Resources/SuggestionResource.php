@@ -2,8 +2,6 @@
 
 namespace App\Filament\Clusters\Requests\Resources;
 
-use Filament\Actions\ActionGroup;
-use Filament\Actions\ForceDeleteAction;
 use App\Enums\RequestClass;
 use App\Enums\UserRole;
 use App\Filament\Actions\Tables\AcknowledgeRequestAction;
@@ -21,6 +19,8 @@ use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListSuggestions;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\NewSuggestion;
 use App\Filament\Resources\RequestResource;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\ForceDeleteAction;
 use Illuminate\Support\Facades\Auth;
 
 class SuggestionResource extends RequestResource
@@ -29,7 +29,7 @@ class SuggestionResource extends RequestResource
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-light-bulb';
+    protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
 
     protected static ?string $label = 'Suggestions';
 

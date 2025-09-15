@@ -2,13 +2,13 @@
 
 namespace App\Filament\Actions\Concerns;
 
-use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Models\Request;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Auth;
 
 trait UpdateRequest
@@ -29,7 +29,7 @@ trait UpdateRequest
 
         $this->modalCancelActionLabel('Cancel');
 
-        $this->modalWidth(Width::ExtraLarge);
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->successNotificationTitle('Request updated');
 

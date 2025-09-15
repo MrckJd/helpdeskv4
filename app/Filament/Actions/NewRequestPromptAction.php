@@ -2,11 +2,11 @@
 
 namespace App\Filament\Actions;
 
-use Filament\Support\Enums\Width;
 use App\Enums\RequestClass;
 use App\Models\Organization;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Support\Enums\MaxWidth;
 use Livewire\Component;
 
 class NewRequestPromptAction extends Action
@@ -23,13 +23,13 @@ class NewRequestPromptAction extends Action
 
         $this->modalIcon('heroicon-o-plus');
 
-        $this->modalWidth(Width::Large);
+        $this->modalWidth(MaxWidth::Large);
 
         $this->modalDescription('Which organization do you want to create a new request for?');
 
         $this->modalSubmitActionLabel('Proceed');
 
-        $this->schema(function () {
+        $this->form(function () {
             $organizations = Organization::query()
                 ->whereHas('subcategories')
                 ->get(['organizations.name', 'organizations.code', 'organizations.id'])

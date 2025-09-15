@@ -2,25 +2,12 @@
 
 namespace App\Filament\Clusters\Management\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Group;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\RestoreAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
-use App\Filament\Clusters\Management\Resources\OrganizationResource\Pages\ListOrganizations;
-use App\Filament\Clusters\Management\Resources\OrganizationResource\Pages\CreateOrganization;
-use App\Filament\Clusters\Management\Resources\OrganizationResource\Pages\EditOrganization;
 use App\Filament\Clusters\Management;
 use App\Filament\Clusters\Management\Resources\OrganizationResource\Pages;
 use App\Models\Organization;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -33,7 +20,7 @@ class OrganizationResource extends Resource
 
     protected static ?string $model = Organization::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-domain-o';
+    protected static ?string $navigationIcon = 'gmdi-domain-o';
 
     protected static ?string $cluster = Management::class;
 
@@ -41,46 +28,46 @@ class OrganizationResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Filament::getCurrentOrDefaultPanel()->getId() === 'root';
+        return Filament::getCurrentPanel()->getId() === 'root';
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->columns(3)
-            ->components([
-                FileUpload::make('logo')
+            ->schema([
+                Forms\Components\FileUpload::make('logo')
                     ->avatar()
                     ->alignCenter()
                     ->directory('logos'),
-                Group::make()
+                Forms\Components\Group::make()
                     ->columnSpan([
                         'md' => 2,
                     ])
                     ->schema([
-                        TextInput::make('name')
+                        Forms\Components\TextInput::make('name')
                             ->autofocus()
                             ->unique(ignoreRecord: true)
                             ->markAsRequired()
                             ->rule('required'),
-                        TextInput::make('code')
+                        Forms\Components\TextInput::make('code')
                             ->unique(ignoreRecord: true)
                             ->markAsRequired()
                             ->rule('required'),
                     ]),
-                TextInput::make('address')
+                Forms\Components\TextInput::make('address')
                     ->maxLength(255)
                     ->columnSpan([
                         'sm' => 1,
                         'md' => 3,
                     ]),
-                TextInput::make('building')
+                Forms\Components\TextInput::make('building')
                     ->maxLength(255)
                     ->columnSpan([
                         'sm' => 1,
                         'md' => 2,
                     ]),
-                TextInput::make('room')
+                Forms\Components\TextInput::make('room')
                     ->columnSpan(1),
             ]);
     }
@@ -89,41 +76,41 @@ class OrganizationResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('logo_url')
+                Tables\Columns\ImageColumn::make('logo_url')
                     ->label('')
                     ->circular()
                     ->extraImgAttributes(['loading' => 'lazy'])
                     ->grow(0),
-                TextColumn::make('name')
+                Tables\Columns\TextColumn::make('name')
                     ->searchable(isIndividual: true)
                     ->sortable(),
-                TextColumn::make('code')
+                Tables\Columns\TextColumn::make('code')
                     ->searchable(isIndividual: true)
                     ->sortable(),
-                TextColumn::make('users_count')
+                Tables\Columns\TextColumn::make('users_count')
                     ->label('Users')
                     ->counts('users')
                     ->sortable(),
-                TextColumn::make('deleted_at')
+                Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->recordActions([
-                RestoreAction::make(),
-                EditAction::make(),
-                ActionGroup::make([
-                    DeleteAction::make()
+            ->actions([
+                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make()
                         ->modalDescription('Deleting this office will affect all related records associated with it e.g. categories and subcategories under this office.'),
-                    ForceDeleteAction::make()
+                    Tables\Actions\ForceDeleteAction::make()
                         ->modalDescription(function () {
                             $description = <<<'HTML'
                                 <p class="mt-2 text-sm text-gray-500 fi-modal-description dark:text-gray-400">
@@ -146,9 +133,9 @@ class OrganizationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListOrganizations::route('/'),
-            'create' => CreateOrganization::route('/create'),
-            'edit' => EditOrganization::route('/{record}/edit'),
+            'index' => Pages\ListOrganizations::route('/'),
+            'create' => Pages\CreateOrganization::route('/create'),
+            'edit' => Pages\EditOrganization::route('/{record}/edit'),
         ];
     }
 

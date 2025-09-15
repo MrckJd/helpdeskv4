@@ -2,7 +2,6 @@
 
 namespace App\Filament\Clusters\Dossiers\Resources\OpenDossierResource\Pages;
 
-use Filament\Actions\CreateAction;
 use App\Filament\Clusters\Dossiers\Resources\OpenDossierResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -20,7 +19,7 @@ class ListOpenDossiers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
+            Actions\CreateAction::make()
                 ->label('New dossier')
                 ->modalHeading('Create new dossier')
                 ->createAnother(false)

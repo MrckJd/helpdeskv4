@@ -2,8 +2,6 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
 use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
@@ -12,6 +10,8 @@ use App\Filament\Forms\FileAttachment;
 use App\Models\Request;
 use Exception;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class AcknowledgeRequestAction extends Action
@@ -42,7 +42,7 @@ class AcknowledgeRequestAction extends Action
 
         $this->modalSubmitActionLabel('Confirm');
 
-        $this->modalWidth(Width::ExtraLarge);
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->successNotificationTitle('Request acknowledged');
 

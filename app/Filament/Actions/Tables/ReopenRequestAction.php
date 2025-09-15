@@ -2,14 +2,14 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
 use App\Filament\Forms\FileAttachment;
 use App\Models\Request;
 use Exception;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class ReopenRequestAction extends Action
@@ -34,7 +34,7 @@ class ReopenRequestAction extends Action
 
         $this->modalDescription('Reopen this request if you think it has not been resolved yet.');
 
-        $this->modalWidth(Width::ExtraLarge);
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->successNotificationTitle('Request reopened');
 

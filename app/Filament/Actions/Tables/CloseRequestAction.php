@@ -2,8 +2,6 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
 use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
@@ -11,6 +9,8 @@ use App\Models\Request;
 use Exception;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Radio;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class CloseRequestAction extends Action
@@ -41,7 +41,7 @@ class CloseRequestAction extends Action
 
         $this->modalDescription('Close this request prematurely.');
 
-        $this->modalWidth(Width::ExtraLarge);
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->closeModalByClickingAway(false);
 

@@ -25,7 +25,7 @@ abstract class RequestResource extends Resource
 
     protected static ?string $model = Request::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $cluster = Requests::class;
 
@@ -33,7 +33,7 @@ abstract class RequestResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $panel = Filament::getCurrentOrDefaultPanel()->getId();
+        $panel = Filament::getCurrentPanel()->getId();
 
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'organization', 'action', 'actions', 'tags', 'category', 'subcategory']))
@@ -83,14 +83,14 @@ abstract class RequestResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters(static::tableFilters())
-            ->recordActions(static::tableActions())
-            ->toolbarActions(static::tableBulkActions())
+            ->actions(static::tableActions())
+            ->bulkActions(static::tableBulkActions())
             ->recordAction(null);
     }
 
     public static function getNavigationBadge(): ?string
     {
-        if (Filament::getCurrentOrDefaultPanel()->getId() === 'root') {
+        if (Filament::getCurrentPanel()->getId() === 'root') {
             return static::getEloquentQuery()->count() ?: null;
         }
 
@@ -101,7 +101,7 @@ abstract class RequestResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $panel = Filament::getCurrentOrDefaultPanel()->getId();
+        $panel = Filament::getCurrentPanel()->getId();
 
         $query = parent::getEloquentQuery()
             ->when(static::$class, fn ($query, $class) => $query->where('class', $class))
@@ -133,7 +133,7 @@ abstract class RequestResource extends Resource
             ];
         }
 
-        return match (Filament::getCurrentOrDefaultPanel()->getId()) {
+        return match (Filament::getCurrentPanel()->getId()) {
             'root' => [
                 TagFilter::make(),
                 OrganizationFilter::make()

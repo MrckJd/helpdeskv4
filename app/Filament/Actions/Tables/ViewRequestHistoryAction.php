@@ -2,9 +2,9 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
 use App\Models\Request;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 
 class ViewRequestHistoryAction extends Action
 {
@@ -22,7 +22,7 @@ class ViewRequestHistoryAction extends Action
 
         $this->modalIcon('gmdi-history-o');
 
-        $this->modalWidth(Width::ExtraLarge);
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->modalHeading('Request History');
 

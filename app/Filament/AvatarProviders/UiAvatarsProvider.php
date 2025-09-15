@@ -18,17 +18,7 @@ class UiAvatarsProvider extends \Filament\AvatarProviders\UiAvatarsProvider
             ->map(fn (string $segment): string => filled($segment) ? mb_substr($segment, 0, 1) : '')
             ->join(' ');
 
-        $primaryColor = FilamentColor::getColors()['primary'][500];
-            if (str_starts_with($primaryColor, '#')) {
-                $backgroundColor = ltrim($primaryColor, '#');
-            } else {
-                try {
-                    $backgroundColor = ltrim(Rgb::fromString($primaryColor)->toHex(), '#');
-                } catch (\Throwable $e) {
-                    // fallback to a default color if conversion fails
-                    $backgroundColor = '000000';
-                }
-        }
+        $backgroundColor = Rgb::fromString('rgb('.FilamentColor::getColors()['primary'][500].')')->toHex();
 
         return 'https://ui-avatars.com/api/?name='.urlencode($name).'&color=FFFFFF&background='.str($backgroundColor)->after('#');
     }

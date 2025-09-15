@@ -2,19 +2,6 @@
 
 namespace App\Filament\Clusters\Management\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\RestoreAction;
-use Filament\Actions\EditAction;
-use Filament\Support\Enums\Width;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ForceDeleteAction;
-use App\Filament\Clusters\Management\Resources\UserResource\Pages\ListUsers;
 use App\Enums\UserRole;
 use App\Filament\Actions\Tables\ApproveAccountAction;
 use App\Filament\Actions\Tables\DeactivateAccessAction;
@@ -25,7 +12,9 @@ use App\Filament\Filters\RoleFilter;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,7 +27,7 @@ class UserResource extends Resource
 
     protected static ?string $model = User::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-supervised-user-circle-o';
+    protected static ?string $navigationIcon = 'gmdi-supervised-user-circle-o';
 
     protected static ?string $cluster = Management::class;
 
@@ -48,40 +37,40 @@ class UserResource extends Resource
 
     public static function canAccess(): bool
     {
-        return in_array(Filament::getCurrentOrDefaultPanel()->getId(), ['root', 'admin']);
+        return in_array(Filament::getCurrentPanel()->getId(), ['root', 'admin']);
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->columns(1)
-            ->components([
-                FileUpload::make('avatar')
+            ->schema([
+                Forms\Components\FileUpload::make('avatar')
                     ->avatar()
                     ->alignCenter()
                     ->directory('avatars'),
-                TextInput::make('name')
+                Forms\Components\TextInput::make('name')
                     ->unique(ignoreRecord: true)
                     ->markAsRequired()
                     ->rule('required')
                     ->prefixIcon('heroicon-o-user-circle'),
-                TextInput::make('designation')
+                Forms\Components\TextInput::make('designation')
                     ->prefixIcon('heroicon-o-briefcase'),
-                Select::make('organization_id')
+                Forms\Components\Select::make('organization_id')
                     ->relationship('organization', 'name')
-                    ->visible(Filament::getCurrentOrDefaultPanel()->getId() === 'root')
+                    ->visible(Filament::getCurrentPanel()->getId() === 'root')
                     ->prefixIcon('gmdi-business'),
-                Select::make('role')
+                Forms\Components\Select::make('role')
                     ->options(UserRole::options(Auth::user()->root))
                     ->prefixIcon('gmdi-shield-o')
                     ->default('user')
                     ->required(),
-                TextInput::make('email')
+                Forms\Components\TextInput::make('email')
                     ->rules(['email', 'required'])
                     ->unique(ignoreRecord: true)
                     ->markAsRequired()
                     ->prefixIcon('heroicon-o-at-symbol'),
-                TextInput::make('number')
+                Forms\Components\TextInput::make('number')
                     ->label('Number')
                     ->placeholder('9xx xxx xxxx')
                     ->mask('999 999 9999')
@@ -96,58 +85,58 @@ class UserResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $panel = Filament::getCurrentOrDefaultPanel()->getId();
+        $panel = Filament::getCurrentPanel()->getId();
 
         return $table
             ->columns([
-                ImageColumn::make('avatar_url')
+                Tables\Columns\ImageColumn::make('avatar_url')
                     ->label('')
                     ->circular()
                     ->extraImgAttributes(['loading' => 'lazy'])
                     ->grow(false),
-                TextColumn::make('name')
+                Tables\Columns\TextColumn::make('name')
                     ->searchable(isIndividual: true)
                     ->sortable(),
-                TextColumn::make('email')
+                Tables\Columns\TextColumn::make('email')
                     ->searchable(isIndividual: true)
                     ->sortable(),
-                TextColumn::make('organization.code')
+                Tables\Columns\TextColumn::make('organization.code')
                     ->visible($panel === 'root')
                     ->searchable(isIndividual: true)
                     ->sortable(),
-                TextColumn::make('role')
+                Tables\Columns\TextColumn::make('role')
                     ->searchable(),
-                TextColumn::make('approvedBy.name')
+                Tables\Columns\TextColumn::make('approvedBy.name')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deactivatedBy.name')
+                Tables\Columns\TextColumn::make('deactivatedBy.name')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('approved_at')
+                Tables\Columns\TextColumn::make('approved_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('verified_at')
+                Tables\Columns\TextColumn::make('verified_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('approved_at')
+                Tables\Columns\TextColumn::make('approved_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deactivated_at')
+                Tables\Columns\TextColumn::make('deactivated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
+                Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
+                Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -158,19 +147,19 @@ class UserResource extends Resource
                     ->visible($panel === 'root'),
                 RoleFilter::make(),
             ])
-            ->recordActions([
+            ->actions([
                 ApproveAccountAction::make()
                     ->label('Approve'),
-                RestoreAction::make(),
-                EditAction::make()
+                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\EditAction::make()
                     ->slideOver()
-                    ->modalWidth(Width::Medium),
-                ActionGroup::make([
+                    ->modalWidth(MaxWidth::Medium),
+                Tables\Actions\ActionGroup::make([
                     DeactivateAccessAction::make()
                         ->label(fn (User $user) => $user->deactivated_at ? 'Reactivate' : 'Deactivate'),
-                    DeleteAction::make()
+                    Tables\Actions\DeleteAction::make()
                         ->visible($panel === 'root'),
-                    ForceDeleteAction::make()
+                    Tables\Actions\ForceDeleteAction::make()
                         ->visible($panel === 'root'),
                 ]),
             ])
@@ -181,7 +170,7 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListUsers::route('/'),
+            'index' => Pages\ListUsers::route('/'),
         ];
     }
 
@@ -190,7 +179,7 @@ class UserResource extends Resource
         $query = parent::getEloquentQuery()
             ->whereNot('id', Auth::id());
 
-        return match (Filament::getCurrentOrDefaultPanel()->getId()) {
+        return match (Filament::getCurrentPanel()->getId()) {
             'root' => $query
                 ->withoutGlobalScopes([
                     SoftDeletingScope::class,

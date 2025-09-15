@@ -2,17 +2,12 @@
 
 namespace App\Filament\Clusters\Management\Pages;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Group;
-use Filament\Forms\Components\TextInput;
 use App\Filament\Clusters\Management;
 use App\Models\Organization;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\InteractsWithFormActions;
 use Filament\Pages\Page;
@@ -27,15 +22,15 @@ class Settings extends Page
 
     protected static ?int $navigationSort = PHP_INT_MAX;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-settings-o';
+    protected static ?string $navigationIcon = 'gmdi-settings-o';
 
-    protected string $view = 'filament.panels.admin.clusters.organization.pages.settings';
+    protected static string $view = 'filament.panels.admin.clusters.organization.pages.settings';
 
     protected static ?string $cluster = Management::class;
 
     public static function canAccess(): bool
     {
-        return Filament::getCurrentOrDefaultPanel()->getId() !== 'root';
+        return Filament::getCurrentPanel()->getId() !== 'root';
     }
 
     public function mount(): void
@@ -56,65 +51,65 @@ class Settings extends Page
         return [];
     }
 
-    public function form(Schema $schema): Schema
+    public function form(Form $form): Form
     {
-        return $schema
-            ->components([
-                Tabs::make()
+        return $form
+            ->schema([
+                Forms\Components\Tabs::make()
                     ->contained(false)
                     ->columns(3)
                     ->tabs([
-                        Tab::make('Organization')
+                        Forms\Components\Tabs\Tab::make('Organization')
                             ->icon('gmdi-domain-o')
                             ->schema([
-                                FileUpload::make('logo')
+                                Forms\Components\FileUpload::make('logo')
                                     ->avatar()
                                     ->alignCenter()
                                     ->directory('logos'),
-                                Group::make()
+                                Forms\Components\Group::make()
                                     ->columnSpan([
                                         'md' => 2,
                                     ])
                                     ->schema([
-                                        TextInput::make('name')
+                                        Forms\Components\TextInput::make('name')
                                             ->unique(ignoreRecord: true)
                                             ->markAsRequired()
                                             ->rule('required'),
-                                        TextInput::make('code')
+                                        Forms\Components\TextInput::make('code')
                                             ->markAsRequired()
                                             ->rule('required')
                                             ->unique(ignoreRecord: true),
                                     ]),
-                                TextInput::make('address')
+                                Forms\Components\TextInput::make('address')
                                     ->maxLength(255)
                                     ->columnSpan([
                                         'sm' => 1,
                                         'md' => 3,
                                     ]),
-                                TextInput::make('building')
+                                Forms\Components\TextInput::make('building')
                                     ->maxLength(255)
                                     ->columnSpan([
                                         'sm' => 1,
                                         'md' => 2,
                                     ]),
-                                TextInput::make('room')
+                                Forms\Components\TextInput::make('room')
                                     ->columnSpan(1),
                             ]),
-                        Tab::make('Configuration')
+                        Forms\Components\Tabs\Tab::make('Configuration')
                             ->icon('gmdi-build-circle-o')
                             ->schema([
-                                TextInput::make('settings.auto_queue')
+                                Forms\Components\TextInput::make('settings.auto_queue')
                                     ->label('Request auto queue')
                                     ->placeholder('Number of minutes')
                                     ->helperText('Number of minutes to auto queue a request')
                                     ->rules(['numeric']),
-                                TextInput::make('settings.auto_resolve')
+                                Forms\Components\TextInput::make('settings.auto_resolve')
                                     ->label('Request auto resolve')
                                     ->placeholder('Number of hours')
                                     ->helperText('Number of hours to auto resolve a completed request')
                                     ->minValue(48)
                                     ->rules(['numeric']),
-                                TextInput::make('settings.auto_assign')
+                                Forms\Components\TextInput::make('settings.auto_assign')
                                     ->label('Request auto assign')
                                     ->placeholder('Number of minutes')
                                     ->helperText('Number of minutes to auto assign a request')

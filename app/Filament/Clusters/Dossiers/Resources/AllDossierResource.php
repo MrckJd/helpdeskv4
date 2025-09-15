@@ -2,22 +2,6 @@
 
 namespace App\Filament\Clusters\Dossiers\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\MarkdownEditor;
-use Filament\Forms\Components\Repeater;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Actions\ViewAction;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Support\Enums\TextSize;
-use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Actions\Action;
-use Filament\Infolists\Components\ViewEntry;
-use App\Filament\Clusters\Dossiers\Resources\AllDossierResource\Pages\ListDossiers;
-use App\Filament\Clusters\Dossiers\Resources\AllDossierResource\Pages\ViewDossier;
 use App\Filament\Actions\Tables\NoteDossierAction;
 use App\Filament\Clusters\Dossiers;
 use App\Filament\Clusters\Dossiers\Resources\AllDossierResource\Pages;
@@ -27,7 +11,10 @@ use App\Models\Note;
 use App\Models\Request;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Infolists;
+use Filament\Infolists\Components\TextEntry\TextEntrySize;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
@@ -44,7 +31,7 @@ class AllDossierResource extends Resource
 
     protected static ?string $model = Dossier::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-list-o';
+    protected static ?string $navigationIcon = 'gmdi-list-o';
 
     protected static ?string $cluster = Dossiers::class;
 
@@ -56,13 +43,13 @@ class AllDossierResource extends Resource
 
     protected static ?string $navigationLabel = 'All';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
-            ->components([
-                Hidden::make('user_id')
+        return $form
+            ->schema([
+                Forms\Components\Hidden::make('user_id')
                     ->default(Auth::id()),
-                Select::make('organization_id')
+                Forms\Components\Select::make('organization_id')
                     ->columnSpanFull()
                     ->visible(Auth::user()->root)
                     ->default(Auth::user()->organization_id)
@@ -70,13 +57,13 @@ class AllDossierResource extends Resource
                     ->relationship('organization', 'name')
                     ->preload()
                     ->required(),
-                TextInput::make('name')
+                Forms\Components\TextInput::make('name')
                     ->columnSpanFull()
                     ->required(),
-                MarkdownEditor::make('description')
+                Forms\Components\MarkdownEditor::make('description')
                     ->columnSpanFull()
                     ->required(),
-                Repeater::make('records')
+                Forms\Components\Repeater::make('records')
                     ->visibleOn('create')
                     ->columnSpanFull()
                     ->relationship()
@@ -84,7 +71,7 @@ class AllDossierResource extends Resource
                     ->addActionLabel('Add record')
                     ->defaultItems(1)
                     ->simple(
-                        Select::make('request_id')
+                        Forms\Components\Select::make('request_id')
                             ->relationship(
                                 'request',
                                 'code',
@@ -112,23 +99,23 @@ class AllDossierResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->limit(36)
                     ->wrap()
                     ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null),
-                TextColumn::make('requests_count')
+                Tables\Columns\TextColumn::make('requests_count')
                     ->counts('requests')
                     ->label('Requests'),
-                TextColumn::make('user.name')
+                Tables\Columns\TextColumn::make('user.name')
                     ->searchable(['name', 'email']),
             ])
             ->filters([
-                TrashedFilter::make(),
+                Tables\Filters\TrashedFilter::make(),
             ])
-            ->recordActions([
+            ->actions([
                 NoteDossierAction::make(),
-                ViewAction::make()
+                Tables\Actions\ViewAction::make()
                     ->url(fn (Dossier $dossier, Component $livewire) => $livewire::getResource()::getUrl('show', ['record' => $dossier->id])),
             ])
             ->emptyStateHeading('No dossiers found')
@@ -136,27 +123,27 @@ class AllDossierResource extends Resource
             ->recordAction(null);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
-        return $schema
+        return $infolist
             ->columns(1)
-            ->components([
-                TextEntry::make('name')
-                    ->size(TextSize::Large)
+            ->schema([
+                Infolists\Components\TextEntry::make('name')
+                    ->size(TextEntrySize::Large)
                     ->weight(FontWeight::Bold),
-                TextEntry::make('created')
+                Infolists\Components\TextEntry::make('created')
                     ->weight(FontWeight::SemiBold)
                     ->state(fn (Dossier $record) => "By {$record->user->name} on {$record->created_at->format('jS \of F Y')} at {$record->created_at->format('H:i')}"
                     ),
-                TextEntry::make('description')
+                Infolists\Components\TextEntry::make('description')
                     ->visible(fn (Dossier $record) => filled($record->description))
                     ->markdown(),
-                RepeatableEntry::make('notes')
+                Infolists\Components\RepeatableEntry::make('notes')
                     // ->contained(false)
                     ->visible(fn (Dossier $record) => $record->notes->isNotEmpty())
                     ->schema([
-                        TextEntry::make('user.name')
-                            ->suffixAction(fn (Note $note) => Action::make('delete-'.$note->id)
+                        Infolists\Components\TextEntry::make('user.name')
+                            ->suffixAction(fn (Note $note) => Infolists\Components\Actions\Action::make('delete-'.$note->id)
                                 ->requiresConfirmation()
                                 ->icon('heroicon-o-trash')
                                 ->color('danger')
@@ -178,10 +165,10 @@ class AllDossierResource extends Resource
                                     ->toHtmlString();
                             })
                             ->hiddenLabel(),
-                        TextEntry::make('content')
+                        Infolists\Components\TextEntry::make('content')
                             ->hiddenLabel()
                             ->markdown(),
-                        ViewEntry::make('attachment')
+                        Infolists\Components\ViewEntry::make('attachment')
                             ->hiddenLabel()
                             ->visible(fn (Note $note) => $note->attachment?->exists)
                             ->view('filament.attachments.show'),
@@ -199,14 +186,14 @@ class AllDossierResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListDossiers::route('/'),
-            'show' => ViewDossier::route('/{record}'),
+            'index' => Pages\ListDossiers::route('/'),
+            'show' => Pages\ViewDossier::route('/{record}'),
         ];
     }
 
     public static function getEloquentQuery(): Builder
     {
-        $panel = Filament::getCurrentOrDefaultPanel()->getId();
+        $panel = Filament::getCurrentPanel()->getId();
 
         $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
