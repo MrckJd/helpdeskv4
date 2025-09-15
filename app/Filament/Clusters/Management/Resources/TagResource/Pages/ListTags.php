@@ -2,11 +2,12 @@
 
 namespace App\Filament\Clusters\Management\Resources\TagResource\Pages;
 
+use Filament\Actions\CreateAction;
+use Filament\Support\Enums\Width;
+use Filament\Schemas\Components\Tabs\Tab;
 use App\Filament\Clusters\Management\Resources\TagResource;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Support\Enums\MaxWidth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,11 +18,11 @@ class ListTags extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
+            CreateAction::make()
                 ->createAnother(false)
                 ->slideOver()
-                ->modalWidth(MaxWidth::Large)
-                ->mutateFormDataUsing(function (array $data) {
+                ->modalWidth(Width::Large)
+                ->mutateDataUsing(function (array $data) {
                     return [
                         ...$data,
                         'organization_id' => $data['organization_id'] ?? Auth::user()->organization_id,

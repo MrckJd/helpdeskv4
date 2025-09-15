@@ -2,13 +2,14 @@
 
 namespace App\Filament\Clusters\Dossiers\Resources;
 
+use Filament\Schemas\Schema;
+use App\Filament\Clusters\Dossiers\Resources\ClosedDossierResource\Pages\ListClosedDossiers;
+use App\Filament\Clusters\Dossiers\Resources\ClosedDossierResource\Pages\ViewDossier;
 use App\Enums\ActionStatus;
 use App\Filament\Clusters\Dossiers;
 use App\Filament\Clusters\Dossiers\Resources\ClosedDossierResource\Pages;
 use App\Models\Dossier;
 use Filament\Facades\Filament;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +20,7 @@ class ClosedDossierResource extends Resource
 {
     protected static ?string $model = Dossier::class;
 
-    protected static ?string $navigationIcon = 'gmdi-close-o';
+    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-close-o';
 
     protected static ?string $cluster = Dossiers::class;
 
@@ -31,9 +32,9 @@ class ClosedDossierResource extends Resource
 
     protected static ?string $navigationLabel = 'Closed';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return AllDossierResource::form($form);
+        return AllDossierResource::form($schema);
     }
 
     public static function table(Table $table): Table
@@ -41,9 +42,9 @@ class ClosedDossierResource extends Resource
         return AllDossierResource::table($table);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return AllDossierResource::infolist($infolist);
+        return AllDossierResource::infolist($schema);
     }
 
     public static function getRelations(): array
@@ -54,14 +55,14 @@ class ClosedDossierResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListClosedDossiers::route('/'),
-            'show' => Pages\ViewDossier::route('/{record}'),
+            'index' => ListClosedDossiers::route('/'),
+            'show' => ViewDossier::route('/{record}'),
         ];
     }
 
     public static function getEloquentQuery(): Builder
     {
-        $panel = Filament::getCurrentPanel()->getId();
+        $panel = Filament::getCurrentOrDefaultPanel()->getId();
 
         $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([

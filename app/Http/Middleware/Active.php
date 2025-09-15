@@ -10,7 +10,7 @@ class Active
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): mixed  $next
+     * @param Closure(Request):mixed $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)

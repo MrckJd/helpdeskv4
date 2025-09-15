@@ -22,7 +22,7 @@ class TicketResource extends RequestResource
 
     protected static ?int $navigationSort = -2;
 
-    protected static ?string $navigationIcon = 'heroicon-o-ticket';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-ticket';
 
     protected static ?string $label = 'Tickets';
 

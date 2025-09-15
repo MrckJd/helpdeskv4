@@ -2,6 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Pages\Dashboard;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
+use Filament\Support\Enums\Width;
 use App\Http\Middleware\Active;
 use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
@@ -14,7 +18,6 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -37,10 +40,10 @@ class UserPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Panels/User/Resources'), for: 'App\\Filament\\Panels\\User\\Resources')
             ->discoverPages(in: app_path('Filament/Panels/User/Pages'), for: 'App\\Filament\\Panels\\User\\Pages')
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
-            ->pages([Pages\Dashboard::class])
+            ->pages([Dashboard::class])
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                AccountWidget::class,
+                FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -61,7 +64,7 @@ class UserPanelProvider extends PanelProvider
                 Initialize::class,
             ])
             ->globalSearch(false)
-            ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
+            ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->databaseTransactions()
             ->databaseNotifications()
             ->topNavigation()

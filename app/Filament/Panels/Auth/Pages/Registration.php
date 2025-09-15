@@ -2,37 +2,38 @@
 
 namespace App\Filament\Panels\Auth\Pages;
 
+use Filament\Auth\Pages\Register;
+use Filament\Support\Enums\Width;
+use Filament\Auth\Http\Responses\Contracts\RegistrationResponse;
+use Filament\Auth\Events\Registered;
+use Filament\Auth\Notifications\VerifyEmail;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
+use Filament\Schemas\Components\Component;
 use App\Enums\UserRole;
 use App\Models\Organization;
 use App\Models\User;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
 use Filament\Actions\Action;
-use Filament\Events\Auth\Registered;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Form;
-use Filament\Http\Responses\Auth\Contracts\RegistrationResponse;
-use Filament\Notifications\Auth\VerifyEmail;
 use Filament\Notifications\Notification;
-use Filament\Pages\Auth\Register;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 
 class Registration extends Register
 {
-    protected ?string $maxWidth = 'xl';
+    protected Width|string|null $maxWidth = 'xl';
 
     protected static string $layout = 'filament-panels::components.layout.base';
 
-    protected static string $view = 'filament.panels.auth.pages.register';
+    protected string $view = 'filament.panels.auth.pages.register';
 
     public function register(): ?RegistrationResponse
     {
@@ -84,7 +85,7 @@ class Registration extends Register
         return app(RegistrationResponse::class);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         $next = <<<'JS'
             $wire.dispatchFormEvent(
@@ -95,7 +96,7 @@ class Registration extends Register
         JS;
 
         return $this->makeForm()
-            ->schema([
+            ->components([
                 Hidden::make('role')
                     ->default('user'),
                 Wizard::make([

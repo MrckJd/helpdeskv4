@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Support\Enums\Width;
 use App\Filament\Panels\Auth\Controllers\EmailVerificationController;
 use App\Filament\Panels\Auth\Pages\Approval;
 use App\Filament\Panels\Auth\Pages\Deactivated;
@@ -17,7 +18,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -64,7 +64,7 @@ class AuthPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
+            ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->databaseTransactions()
             ->topNavigation()
             ->spa();

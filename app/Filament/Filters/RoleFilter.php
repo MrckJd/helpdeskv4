@@ -31,7 +31,7 @@ class RoleFilter extends Filter
             ->mapWithKeys(fn ($role) => [$role->value => $role->getLabel()])
             ->prepend('Undesignated', -1);
 
-        $this->form([
+        $this->schema([
             Select::make('role')
                 ->label('Designated role')
                 ->options($roles->toArray())

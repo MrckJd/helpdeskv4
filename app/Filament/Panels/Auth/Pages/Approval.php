@@ -17,7 +17,7 @@ class Approval extends SimplePage implements HasMiddleware
 
     protected static string $layout = 'filament-panels::components.layout.base';
 
-    protected static string $view = 'filament.panels.auth.pages.approval';
+    protected string $view = 'filament.panels.auth.pages.approval';
 
     public static function getSlug(): string
     {

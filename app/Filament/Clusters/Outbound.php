@@ -9,10 +9,10 @@ class Outbound extends Cluster
 {
     protected static ?int $navigationSort = 4;
 
-    protected static ?string $navigationIcon = 'gmdi-call-split-o';
+    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-call-split-o';
 
     public static function canAccess(): bool
     {
-        return in_array(Filament::getCurrentPanel()->getId(), ['admin', 'moderator']);
+        return in_array(Filament::getCurrentOrDefaultPanel()->getId(), ['admin', 'moderator']);
     }
 }

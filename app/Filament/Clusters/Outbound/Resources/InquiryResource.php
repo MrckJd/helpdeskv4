@@ -20,7 +20,7 @@ class InquiryResource extends RequestResource
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-question-mark-circle';
 
     protected static ?string $label = 'Inquiries';
 

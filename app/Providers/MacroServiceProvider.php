@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use RuntimeException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
@@ -74,7 +75,7 @@ class MacroServiceProvider extends ServiceProvider
         Grammar::macro('handleInvalidCheckConstraintDriver', function () {
             /** @var Grammar $this */
             if (config('database.check-constraints.sqlite.throw', true)) {
-                throw new \RuntimeException('SQLite driver does not support check constraints.');
+                throw new RuntimeException('SQLite driver does not support check constraints.');
             }
 
             return null;

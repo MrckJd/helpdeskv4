@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions\Tables;
 
+use Filament\Actions\EditAction;
 use App\Filament\Actions\Concerns\UpdateRequest;
-use Filament\Tables\Actions\EditAction;
 
 class UpdateRequestAction extends EditAction
 {

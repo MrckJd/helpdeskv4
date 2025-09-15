@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions\Tables;
 
+use Filament\Actions\RestoreAction;
 use App\Filament\Actions\Concerns\RestoreRequest;
-use Filament\Tables\Actions\RestoreAction;
 
 class RestoreRequestAction extends RestoreAction
 {

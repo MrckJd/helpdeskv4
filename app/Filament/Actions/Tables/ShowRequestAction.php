@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions\Tables;
 
+use Filament\Actions\ViewAction;
 use App\Filament\Actions\Concerns\ShowRequest;
-use Filament\Tables\Actions\ViewAction;
 
 class ShowRequestAction extends ViewAction
 {

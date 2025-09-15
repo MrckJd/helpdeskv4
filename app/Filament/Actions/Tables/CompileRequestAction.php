@@ -2,6 +2,9 @@
 
 namespace App\Filament\Actions\Tables;
 
+use Filament\Actions\Action;
+use Filament\Support\Enums\Width;
+use Filament\Schemas\Schema;
 use App\Filament\Clusters\Dossiers;
 use App\Filament\Clusters\Dossiers\Resources\AllDossierResource;
 use App\Models\Dossier;
@@ -9,10 +12,7 @@ use App\Models\Request;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Filament\Support\Enums\MaxWidth;
-use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class CompileRequestAction extends Action
@@ -31,7 +31,7 @@ class CompileRequestAction extends Action
 
         $this->modalIcon(Dossiers::getNavigationIcon());
 
-        $this->modalWidth(MaxWidth::ExtraLarge);
+        $this->modalWidth(Width::ExtraLarge);
 
         $this->modalSubmitActionLabel('Compile');
 
@@ -51,7 +51,7 @@ class CompileRequestAction extends Action
                 ->noSearchResultsMessage('No dossiers found.')
                 ->placeholder('Select a dossier')
                 ->createOptionForm(fn (HasForms $livewire) => [
-                    ...AllDossierResource::form(new Form($livewire))->getComponents(),
+                    ...AllDossierResource::form(new Schema($livewire))->getComponents(),
                     Hidden::make('organization_id')
                         ->default(Auth::user()->organization_id),
                 ])
@@ -59,7 +59,7 @@ class CompileRequestAction extends Action
                     $action->label('New dossier')
                         ->modalHeading('Create new dossier')
                         ->slideOver()
-                        ->modalWidth(MaxWidth::ExtraLarge);
+                        ->modalWidth(Width::ExtraLarge);
                 })
                 ->rule(fn (Request $request) => function ($a, $v, $f) use ($request) {
                     if ($request->dossiers()->where('dossier_id', $v)->exists()) {

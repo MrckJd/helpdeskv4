@@ -2,11 +2,12 @@
 
 namespace App\Filament\Actions;
 
+use App\Filament\Actions\Concerns\InviteUser;
 use Filament\Actions\Action;
 
 class InviteUserAction extends Action
 {
-    use Concerns\InviteUser;
+    use InviteUser;
 
     protected function setUp(): void
     {

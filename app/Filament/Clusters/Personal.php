@@ -9,10 +9,10 @@ class Personal extends Cluster
 {
     protected static ?int $navigationSort = PHP_INT_MAX;
 
-    protected static ?string $navigationIcon = 'gmdi-support-agent-o';
+    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-support-agent-o';
 
     public static function getNavigationLabel(): string
     {
-        return Filament::getCurrentPanel()->getId() === 'user' ? 'Requests' : parent::getNavigationLabel();
+        return Filament::getCurrentOrDefaultPanel()->getId() === 'user' ? 'Requests' : parent::getNavigationLabel();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Panels\Auth\Pages;
 
+use Filament\Support\Enums\Width;
 use App\Enums\UserRole;
 use App\Filament\Panels\Auth\Concerns\BaseAuthPage;
 use App\Http\Middleware\Authenticate;
@@ -43,9 +44,9 @@ class Invitation extends SimplePage implements HasMiddleware
 
     protected static string $layout = 'filament-panels::components.layout.base';
 
-    protected static string $view = 'filament.panels.auth.pages.invitation';
+    protected string $view = 'filament.panels.auth.pages.invitation';
 
-    protected ?string $maxWidth = 'xl';
+    protected Width|string|null $maxWidth = 'xl';
 
     protected ?string $heading = 'Invitation Request';
 

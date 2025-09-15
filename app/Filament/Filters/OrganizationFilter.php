@@ -31,7 +31,7 @@ class OrganizationFilter extends Filter
     {
         parent::setUp();
 
-        $this->form(function () {
+        $this->schema(function () {
             $organizations = Organization::query()->pluck('code', 'id')->toArray();
 
             return [

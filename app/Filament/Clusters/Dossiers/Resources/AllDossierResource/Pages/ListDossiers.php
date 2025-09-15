@@ -2,10 +2,11 @@
 
 namespace App\Filament\Clusters\Dossiers\Resources\AllDossierResource\Pages;
 
+use Filament\Actions\CreateAction;
+use Filament\Support\Enums\Width;
 use App\Filament\Clusters\Dossiers\Resources\AllDossierResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Support\Enums\MaxWidth;
 use Illuminate\Contracts\Support\Htmlable;
 
 class ListDossiers extends ListRecords
@@ -20,12 +21,12 @@ class ListDossiers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
+            CreateAction::make()
                 ->label('New dossier')
                 ->modalHeading('Create new dossier')
                 ->createAnother(false)
                 ->slideOver()
-                ->modalWidth(MaxWidth::ExtraLarge),
+                ->modalWidth(Width::ExtraLarge),
         ];
     }
 }

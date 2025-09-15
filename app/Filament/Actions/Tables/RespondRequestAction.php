@@ -2,6 +2,8 @@
 
 namespace App\Filament\Actions\Tables;
 
+use Filament\Actions\Action;
+use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
@@ -11,8 +13,6 @@ use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
-use Filament\Support\Enums\MaxWidth;
-use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 
@@ -38,10 +38,10 @@ class RespondRequestAction extends Action
 
         $this->slideOver();
 
-        $this->modalWidth(MaxWidth::ExtraLarge);
+        $this->modalWidth(Width::ExtraLarge);
 
         $this->successNotificationTitle(function (Request $request) {
-            $pronoun = match (Filament::getCurrentPanel()->getId()) {
+            $pronoun = match (Filament::getCurrentOrDefaultPanel()->getId()) {
                 'user' => 'your',
                 default => 'the',
             };
@@ -124,7 +124,7 @@ class RespondRequestAction extends Action
         $this->visible(function (Request $request) {
             $valid = $request->class === RequestClass::INQUIRY && ! $request->action->status->finalized();
 
-            return $valid && match (Filament::getCurrentPanel()->getId()) {
+            return $valid && match (Filament::getCurrentOrDefaultPanel()->getId()) {
                 'user' => $request->action->status === ActionStatus::RESPONDED,
                 'moderator', 'agent', 'admin' => in_array($request->action->status, [ActionStatus::RESPONDED, ActionStatus::ASSIGNED]) &&
                     $request->assignees->contains(Auth::user()),

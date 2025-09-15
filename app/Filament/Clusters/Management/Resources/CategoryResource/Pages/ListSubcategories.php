@@ -2,6 +2,21 @@
 
 namespace App\Filament\Clusters\Management\Resources\CategoryResource\Pages;
 
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
+use Filament\Support\Enums\Width;
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Group;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
 use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\TemplatesPreviewActionGroup;
 use App\Filament\Clusters\Management\Resources\CategoryResource;
@@ -9,10 +24,7 @@ use App\Models\Subcategory;
 use Filament\Actions;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ManageRelatedRecords;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -62,18 +74,18 @@ class ListSubcategories extends ManageRelatedRecords
     public function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('back')
+            Action::make('back')
                 ->color('gray')
                 ->icon('heroicon-o-arrow-left')
                 ->url(static::$resource::getUrl()),
-            Actions\CreateAction::make()
+            CreateAction::make()
                 ->model(Subcategory::class)
                 ->createAnother(false)
                 ->slideOver()
-                ->modalWidth(MaxWidth::Large)
+                ->modalWidth(Width::Large)
                 ->closeModalByClickingAway(false)
-                ->form(fn (Form $form) => [
-                    Forms\Components\Select::make('category_id')
+                ->schema(fn (Schema $schema) => [
+                    Select::make('category_id')
                         ->columnSpanFull()
                         ->relationship('category', 'name')
                         ->searchable()
@@ -81,7 +93,7 @@ class ListSubcategories extends ManageRelatedRecords
                         ->default($this->record->getKey())
                         ->hidden()
                         ->dehydratedWhenHidden(),
-                    ...$this->form($form)->getComponents(),
+                    ...$this->form($schema)->getComponents(),
                 ]),
         ];
     }
@@ -91,37 +103,37 @@ class ListSubcategories extends ManageRelatedRecords
         return "{$this->record->name} → Subcategories";
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->columns(1)
-            ->schema([
-                Forms\Components\TextInput::make('name')
+            ->components([
+                TextInput::make('name')
                     ->dehydrateStateUsing(fn (?string $state) => mb_ucfirst($state ?? ''))
                     ->rule('required')
                     ->markAsRequired()
                     ->maxLength(48),
-                Forms\Components\Group::make()
+                Group::make()
                     ->relationship('inquiryTemplate')
                     ->mutateRelationshipDataBeforeCreateUsing(fn (array $data) => [...$data, 'class' => RequestClass::INQUIRY])
                     ->schema([
-                        Forms\Components\MarkdownEditor::make('content')
+                        MarkdownEditor::make('content')
                             ->label('Inquiry Template')
                             ->nullable(),
                     ]),
-                Forms\Components\Group::make()
+                Group::make()
                     ->relationship('suggestionTemplate')
                     ->mutateRelationshipDataBeforeCreateUsing(fn (array $data) => [...$data, 'class' => RequestClass::SUGGESTION])
                     ->schema([
-                        Forms\Components\MarkdownEditor::make('content')
+                        MarkdownEditor::make('content')
                             ->label('Suggestion Template')
                             ->nullable(),
                     ]),
-                Forms\Components\Group::make()
+                Group::make()
                     ->relationship('ticketTemplate')
                     ->mutateRelationshipDataBeforeCreateUsing(fn (array $data) => [...$data, 'class' => RequestClass::TICKET])
                     ->schema([
-                        Forms\Components\MarkdownEditor::make('content')
+                        MarkdownEditor::make('content')
                             ->label('Ticket Template')
                             ->nullable(),
                     ]),
@@ -130,48 +142,48 @@ class ListSubcategories extends ManageRelatedRecords
 
     public function table(Table $table): Table
     {
-        $panel = Filament::getCurrentPanel()->getId();
+        $panel = Filament::getCurrentOrDefaultPanel()->getId();
 
         return $table
             ->heading($panel === 'root' ? "{$this->record->organization->code} → {$this->record->name} → Subcategories" : null)
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('requests_count')
+                TextColumn::make('requests_count')
                     ->label('Requests')
                     ->counts('requests'),
-                Tables\Columns\TextColumn::make('open_count')
+                TextColumn::make('open_count')
                     ->label('Open')
                     ->counts('open'),
-                Tables\Columns\TextColumn::make('closed_count')
+                TextColumn::make('closed_count')
                     ->label('Closed')
                     ->counts('closed'),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->actions([
-                Tables\Actions\RestoreAction::make(),
+            ->recordActions([
+                RestoreAction::make(),
                 TemplatesPreviewActionGroup::make(),
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->slideOver()
-                    ->modalWidth(MaxWidth::Large)
+                    ->modalWidth(Width::Large)
                     ->closeModalByClickingAway(false),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make()
+                ActionGroup::make([
+                    DeleteAction::make()
                         ->modalDescription('Deleting this subcategory will affect all related records associated with it.'),
-                    Tables\Actions\ForceDeleteAction::make()
+                    ForceDeleteAction::make()
                         ->modalDescription(function () {
                             $description = <<<'HTML'
                                 <p class="mt-2 text-sm text-gray-500 fi-modal-description dark:text-gray-400">

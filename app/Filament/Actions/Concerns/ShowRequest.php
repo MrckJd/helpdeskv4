@@ -2,6 +2,8 @@
 
 namespace App\Filament\Actions\Concerns;
 
+use Filament\Support\Enums\Width;
+use Filament\Support\Enums\TextSize;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Models\Request;
@@ -9,7 +11,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\FontWeight;
-use Filament\Support\Enums\MaxWidth;
 
 trait ShowRequest
 {
@@ -37,7 +38,7 @@ trait ShowRequest
 
         $this->modalCancelAction(false);
 
-        $this->modalWidth(MaxWidth::ExtraLarge);
+        $this->modalWidth(Width::ExtraLarge);
 
         $this->infolist(fn (Request $request) => [
             TextEntry::make('tags')
@@ -52,12 +53,12 @@ trait ShowRequest
                 ->helperText(fn (Request $request) => $request->user->name),
             TextEntry::make('action.status')
                 ->hiddenLabel()
-                ->size(TextEntry\TextEntrySize::ExtraSmall)
+                ->size(TextSize::ExtraSmall)
                 ->state(fn (Request $request) => $request->action->status === ActionStatus::CLOSED ? $request->action->resolution : $request->action->status),
             TextEntry::make('subject')
                 ->hiddenLabel()
                 ->weight(FontWeight::Bold)
-                ->size(TextEntry\TextEntrySize::Large),
+                ->size(TextSize::Large),
             TextEntry::make('submitted.created_at')
                 ->hiddenLabel()
                 ->color('gray')

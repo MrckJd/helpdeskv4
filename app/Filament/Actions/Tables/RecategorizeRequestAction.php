@@ -2,14 +2,14 @@
 
 namespace App\Filament\Actions\Tables;
 
+use Filament\Actions\Action;
+use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Models\Request;
 use App\Models\Subcategory;
 use Exception;
 use Filament\Forms\Components\Select;
 use Filament\Support\Enums\Alignment;
-use Filament\Support\Enums\MaxWidth;
-use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class RecategorizeRequestAction extends Action
@@ -28,7 +28,7 @@ class RecategorizeRequestAction extends Action
 
         $this->modalDescription('Move this request to a different category and/or subcategory.');
 
-        $this->modalWidth(MaxWidth::Large);
+        $this->modalWidth(Width::Large);
 
         $this->modalAlignment(Alignment::Left);
 

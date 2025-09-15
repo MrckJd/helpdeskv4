@@ -2,15 +2,27 @@
 
 namespace App\Filament\Clusters\Management\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
+use Filament\Support\Enums\Width;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use App\Filament\Clusters\Management\Resources\CategoryResource\Pages\ListCategories;
+use App\Filament\Clusters\Management\Resources\CategoryResource\Pages\ListSubcategories;
 use App\Filament\Clusters\Management;
 use App\Filament\Clusters\Management\Resources\CategoryResource\Pages;
 use App\Filament\Filters\OrganizationFilter;
 use App\Models\Category;
 use Filament\Facades\Filament;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,22 +33,22 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'gmdi-folder-zip-o';
+    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-folder-zip-o';
 
     protected static ?string $cluster = Management::class;
 
     public static function canAccess(): bool
     {
-        return in_array(Filament::getCurrentPanel()->getId(), ['root', 'admin']);
+        return in_array(Filament::getCurrentOrDefaultPanel()->getId(), ['root', 'admin']);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        $panel = Filament::getCurrentPanel()->getId();
+        $panel = Filament::getCurrentOrDefaultPanel()->getId();
 
-        return $form
-            ->schema([
-                Forms\Components\Select::make('organization_id')
+        return $schema
+            ->components([
+                Select::make('organization_id')
                     ->columnSpanFull()
                     ->relationship('organization', 'code')
                     ->searchable()
@@ -45,7 +57,7 @@ class CategoryResource extends Resource
                     ->default(fn () => $panel !== 'root' ? Auth::user()->organization_id : null)
                     ->visible(fn (string $operation) => $panel === 'root' && $operation === 'create')
                     ->dehydratedWhenHidden(),
-                Forms\Components\TextInput::make('name')
+                TextInput::make('name')
                     ->label('Name')
                     ->columnSpanFull()
                     ->dehydrateStateUsing(fn (?string $state) => mb_ucfirst($state ?? ''))
@@ -57,14 +69,14 @@ class CategoryResource extends Resource
                         modifyRuleUsing: fn ($rule, $get) => $rule->withoutTrashed()
                             ->where('organization_id', $get('organization'))
                     ),
-                Forms\Components\Repeater::make('subcategories')
+                Repeater::make('subcategories')
                     ->relationship()
                     ->columnSpanFull()
                     ->addActionLabel('Add subcategory')
                     ->deletable(fn (string $operation) => $operation === 'create')
                     ->addable(fn (string $operation) => $operation === 'create')
                     ->simple(
-                        Forms\Components\TextInput::make('name')
+                        TextInput::make('name')
                             ->distinct()
                             ->maxLength(48)
                             ->rule('required')
@@ -75,37 +87,37 @@ class CategoryResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $panel = Filament::getCurrentPanel()->getId();
+        $panel = Filament::getCurrentOrDefaultPanel()->getId();
 
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                TextColumn::make('name')
                     ->description(fn (Category $category) => $panel === 'root' ? $category->organization->code : null)
                     ->searchable(isIndividual: true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('subcategories.name')
+                TextColumn::make('subcategories.name')
                     ->searchable(isIndividual: true)
                     ->bulleted()
                     ->limitList(2)
                     ->expandableLimitedList(),
-                Tables\Columns\TextColumn::make('requests_count')
+                TextColumn::make('requests_count')
                     ->label('Requests')
                     ->counts('requests'),
-                Tables\Columns\TextColumn::make('open_count')
+                TextColumn::make('open_count')
                     ->label('Open')
                     ->counts('open'),
-                Tables\Columns\TextColumn::make('closed_count')
+                TextColumn::make('closed_count')
                     ->label('Closed')
                     ->counts('closed'),
-                Tables\Columns\TextColumn::make('deleted_at')
+                TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -114,18 +126,18 @@ class CategoryResource extends Resource
                 OrganizationFilter::make()
                     ->withUnaffiliated(false),
             ])
-            ->actions([
-                Tables\Actions\RestoreAction::make(),
-                Tables\Actions\Action::make('subcategories')
+            ->recordActions([
+                RestoreAction::make(),
+                Action::make('subcategories')
                     ->icon('gmdi-folder-special-o')
                     ->url(fn (Category $category) => static::getUrl('subcategories', [$category->id])),
-                Tables\Actions\EditAction::make()
+                EditAction::make()
                     ->slideOver()
-                    ->modalWidth(MaxWidth::Large),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make()
+                    ->modalWidth(Width::Large),
+                ActionGroup::make([
+                    DeleteAction::make()
                         ->modalDescription('Deleting this category will affect all related records associated with it e.g. subcategories under this category.'),
-                    Tables\Actions\ForceDeleteAction::make()
+                    ForceDeleteAction::make()
                         ->modalDescription(function () {
                             $description = <<<'HTML'
                                 <p class="mt-2 text-sm text-gray-500 fi-modal-description dark:text-gray-400">
@@ -148,8 +160,8 @@ class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategories::route('/'),
-            'subcategories' => Pages\ListSubcategories::route('/{record}/subcategories'),
+            'index' => ListCategories::route('/'),
+            'subcategories' => ListSubcategories::route('/{record}/subcategories'),
         ];
     }
 
@@ -160,7 +172,7 @@ class CategoryResource extends Resource
                 SoftDeletingScope::class,
             ]);
 
-        return match (Filament::getCurrentPanel()->getId()) {
+        return match (Filament::getCurrentOrDefaultPanel()->getId()) {
             'root' => $query,
             'admin' => $query->where('organization_id', Auth::user()->organization_id),
             default => $query->whereRaw('1 = 0'),

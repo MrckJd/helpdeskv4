@@ -2,6 +2,10 @@
 
 namespace App\Filament\Panels\Auth\Pages;
 
+use Filament\Support\Enums\Width;
+use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Wizard;
+use Filament\Schemas\Components\Wizard\Step;
 use App\Filament\Panels\Admin\Clusters\Organization\Resources\UserResource;
 use App\Filament\Panels\Auth\Concerns\BaseAuthPage;
 use App\Http\Middleware\Active;
@@ -15,11 +19,8 @@ use Exception;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\SimplePage;
-use Filament\Support\Enums\MaxWidth;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +36,7 @@ class Initialization extends SimplePage implements HasMiddleware
 
     protected static string $layout = 'filament-panels::components.layout.base';
 
-    protected static string $view = 'filament.panels.auth.pages.initialization';
+    protected string $view = 'filament.panels.auth.pages.initialization';
 
     public static function getSlug(): string
     {
@@ -91,18 +92,18 @@ class Initialization extends SimplePage implements HasMiddleware
         };
     }
 
-    public function getMaxWidth(): MaxWidth|string|null
+    public function getMaxWidth(): Width|string|null
     {
-        return MaxWidth::ExtraLarge;
+        return Width::ExtraLarge;
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
         /** @var User */
         $user = Auth::user();
 
         if (! $user->admin || isset($user->organization_id) && is_null($user->organization)) {
-            return $form;
+            return $schema;
         }
 
         $next = <<<'JS'
@@ -113,15 +114,15 @@ class Initialization extends SimplePage implements HasMiddleware
             )
         JS;
 
-        return $form
+        return $schema
             ->statePath('data')
-            ->schema([
+            ->components([
                 Wizard::make()
                     ->visible()
                     ->contained(false)
                     ->submitAction(new HtmlString(Blade::render('<x-filament::button type="submit">Setup</x-filament::button>')))
                     ->schema([
-                        Wizard\Step::make('Name')
+                        Step::make('Name')
                             ->schema([
                                 TextInput::make('name')
                                     ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
@@ -136,7 +137,7 @@ class Initialization extends SimplePage implements HasMiddleware
                                     ->markAsRequired()
                                     ->rule('required'),
                             ]),
-                        Wizard\Step::make('Address')
+                        Step::make('Address')
                             ->schema([
                                 TextInput::make('address')
                                     ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
@@ -148,7 +149,7 @@ class Initialization extends SimplePage implements HasMiddleware
                                     ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
                                     ->extraAlpineAttributes(['@keyup.enter' => $next]),
                             ]),
-                        Wizard\Step::make('Logo')
+                        Step::make('Logo')
                             ->schema([
                                 FileUpload::make('logo')
                                     ->hiddenLabel()

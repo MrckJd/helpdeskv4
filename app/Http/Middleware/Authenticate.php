@@ -26,7 +26,7 @@ class Authenticate extends Middleware
         /** @var Model $user */
         $user = $guard->user();
 
-        $panel = Filament::getCurrentPanel();
+        $panel = Filament::getCurrentOrDefaultPanel();
 
         abort_if(
             $user instanceof FilamentUser ?

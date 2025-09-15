@@ -2,13 +2,14 @@
 
 namespace App\Filament\Clusters\Dossiers\Resources;
 
+use Filament\Schemas\Schema;
+use App\Filament\Clusters\Dossiers\Resources\OpenDossierResource\Pages\ListOpenDossiers;
+use App\Filament\Clusters\Dossiers\Resources\OpenDossierResource\Pages\ViewDossier;
 use App\Enums\ActionStatus;
 use App\Filament\Clusters\Dossiers;
 use App\Filament\Clusters\Dossiers\Resources\OpenDossierResource\Pages;
 use App\Models\Dossier;
 use Filament\Facades\Filament;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,7 +22,7 @@ class OpenDossierResource extends Resource
 
     protected static ?string $model = Dossier::class;
 
-    protected static ?string $navigationIcon = 'gmdi-circle-o';
+    protected static string | \BackedEnum | null $navigationIcon = 'gmdi-circle-o';
 
     protected static ?string $cluster = Dossiers::class;
 
@@ -33,9 +34,9 @@ class OpenDossierResource extends Resource
 
     protected static ?string $navigationLabel = 'Open';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return AllDossierResource::form($form);
+        return AllDossierResource::form($schema);
     }
 
     public static function table(Table $table): Table
@@ -43,9 +44,9 @@ class OpenDossierResource extends Resource
         return AllDossierResource::table($table);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return AllDossierResource::infolist($infolist);
+        return AllDossierResource::infolist($schema);
     }
 
     public static function getRelations(): array
@@ -56,14 +57,14 @@ class OpenDossierResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOpenDossiers::route('/'),
-            'show' => Pages\ViewDossier::route('/{record}'),
+            'index' => ListOpenDossiers::route('/'),
+            'show' => ViewDossier::route('/{record}'),
         ];
     }
 
     public static function getEloquentQuery(): Builder
     {
-        $panel = Filament::getCurrentPanel()->getId();
+        $panel = Filament::getCurrentOrDefaultPanel()->getId();
 
         $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
