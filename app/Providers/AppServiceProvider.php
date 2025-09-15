@@ -2,18 +2,14 @@
 
 namespace App\Providers;
 
-use Laravel\Telescope\TelescopeServiceProvider;
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Auth\Http\Responses\Contracts\LogoutResponse;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Livewire\Notifications;
 use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\MaxWidth;
 use Filament\Support\Enums\VerticalAlignment;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Filters\SelectFilter;
@@ -41,8 +37,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app->environment('local') && class_exists(TelescopeServiceProvider::class)) {
-            $this->app->register(TelescopeServiceProvider::class);
+        if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
         }
 
         if ($this->app->environment('production')) {
@@ -86,8 +82,8 @@ class AppServiceProvider extends ServiceProvider
                         ->modalSubmitAction(false)
                         ->modalCancelActionLabel('Close')
                         ->modalFooterActionsAlignment(Alignment::End)
-                        ->modalWidth(Width::ExtraLarge)
-                        ->schema(fn ($state) => [
+                        ->modalWidth(MaxWidth::ExtraLarge)
+                        ->infolist(fn ($state) => [
                             TextEntry::make('preview')
                                 ->hiddenLabel()
                                 ->state(str($state ?? '')->markdown()->toHtmlString())
@@ -105,9 +101,9 @@ class AppServiceProvider extends ServiceProvider
         TrashedFilter::configureUsing(fn (TrashedFilter $filter) => $filter->native(false));
 
         $forceDeletes = [
-            ForceDeleteAction::class,
-            ForceDeleteAction::class,
-            ForceDeleteBulkAction::class,
+            \Filament\Actions\ForceDeleteAction::class,
+            \Filament\Tables\Actions\ForceDeleteAction::class,
+            \Filament\Tables\Actions\ForceDeleteBulkAction::class,
         ];
 
         foreach ($forceDeletes as $forceDelete) {
@@ -123,6 +119,6 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
-        $this->app->bind(LogoutResponse::class, \App\Http\Responses\LogoutResponse::class);
+        $this->app->bind(\Filament\Http\Responses\Auth\Contracts\LogoutResponse::class, \App\Http\Responses\LogoutResponse::class);
     }
 }

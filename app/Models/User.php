@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
 use App\Enums\UserRole;
 use App\Filament\AvatarProviders\UiAvatarsProvider;
 use App\Models\Scopes\ActiveScope;
@@ -26,7 +25,7 @@ use Illuminate\Support\Carbon;
 #[ScopedBy([ActiveScope::class])]
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
-    /** @use HasFactory<UserFactory> */
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasUlids, Notifiable, SoftDeletes;
 
     protected $fillable = [

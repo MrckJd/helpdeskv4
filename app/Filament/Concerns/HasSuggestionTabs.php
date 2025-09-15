@@ -2,13 +2,12 @@
 
 namespace App\Filament\Concerns;
 
-use Filament\Schemas\Components\Tabs\Tab;
-use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
+use Filament\Resources\Components\Tab;
 
 /**
- * @mixin ListInquiries
+ * @mixin \App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries
  * @mixin \App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\ListInquiries
  * @mixin \App\Filament\Clusters\Personal\Resources\RequestResource\Pages\ListInquiries
  */

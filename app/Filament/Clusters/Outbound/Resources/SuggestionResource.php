@@ -20,7 +20,7 @@ class SuggestionResource extends RequestResource
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-light-bulb';
+    protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
 
     protected static ?string $label = 'Suggestions';
 

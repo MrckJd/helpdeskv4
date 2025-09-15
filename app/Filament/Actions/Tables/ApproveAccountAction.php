@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
 use App\Filament\Actions\Concerns\ApproveAccount;
+use Filament\Tables\Actions\Action;
 
 class ApproveAccountAction extends Action
 {

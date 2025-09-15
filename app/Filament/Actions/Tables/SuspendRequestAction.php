@@ -2,8 +2,6 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
@@ -11,6 +9,8 @@ use App\Filament\Forms\FileAttachment;
 use App\Models\Request;
 use Exception;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class SuspendRequestAction extends Action
@@ -37,7 +37,7 @@ class SuspendRequestAction extends Action
 
         $this->modalDescription('Suspend this on-going request. This will hold the request until requester complies with the requirements.');
 
-        $this->modalWidth(Width::ExtraLarge);
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->closeModalByClickingAway(false);
 

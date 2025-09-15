@@ -2,8 +2,6 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Filament\Actions\Concerns\Notifications\CanNotifyUsers;
 use App\Filament\Forms\FileAttachment;
@@ -11,6 +9,8 @@ use App\Models\Request;
 use App\Models\User;
 use Exception;
 use Filament\Forms\Components\MarkdownEditor;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class RejectRequestAction extends Action
@@ -35,7 +35,7 @@ class RejectRequestAction extends Action
 
         $this->modalDescription('Reject this request assignment.');
 
-        $this->modalWidth(Width::ExtraLarge);
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->successNotificationTitle('Request assignment rejected');
 

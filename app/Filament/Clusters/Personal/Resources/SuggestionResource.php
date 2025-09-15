@@ -2,7 +2,6 @@
 
 namespace App\Filament\Clusters\Personal\Resources;
 
-use Filament\Actions\ActionGroup;
 use App\Enums\RequestClass;
 use App\Filament\Actions\Tables\CancelRequestAction;
 use App\Filament\Actions\Tables\CompileRequestAction;
@@ -17,6 +16,7 @@ use App\Filament\Clusters\Personal;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\ListSuggestions;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\NewSuggestion;
 use App\Filament\Resources\RequestResource;
+use Filament\Tables\Actions\ActionGroup;
 
 class SuggestionResource extends RequestResource
 {
@@ -28,7 +28,7 @@ class SuggestionResource extends RequestResource
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-light-bulb';
+    protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
 
     protected static ?string $label = 'Suggestions';
 

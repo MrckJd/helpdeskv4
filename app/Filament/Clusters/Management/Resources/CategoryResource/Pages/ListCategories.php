@@ -2,12 +2,11 @@
 
 namespace App\Filament\Clusters\Management\Resources\CategoryResource\Pages;
 
-use Filament\Actions\CreateAction;
-use Filament\Support\Enums\Width;
-use Filament\Schemas\Components\Tabs\Tab;
 use App\Filament\Clusters\Management\Resources\CategoryResource;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListCategories extends ListRecords
@@ -17,10 +16,10 @@ class ListCategories extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
+            Actions\CreateAction::make()
                 ->createAnother(false)
                 ->slideOver()
-                ->modalWidth(Width::Large),
+                ->modalWidth(MaxWidth::Large),
         ];
     }
 

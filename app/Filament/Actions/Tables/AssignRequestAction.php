@@ -2,8 +2,6 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Enums\UserRole;
@@ -15,6 +13,8 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class AssignRequestAction extends Action
@@ -43,7 +43,7 @@ class AssignRequestAction extends Action
 
         $this->modalContent(fn (Request $request) => $request->organization->users()->agent(moderators: true, admin: Auth::user()->role !== UserRole::MODERATOR)->doesntExist() ? str('No support users found')->toHtmlString() : null);
 
-        $this->modalWidth(Width::ExtraLarge);
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->modalSubmitAction(fn (Request $request) => $request->organization->users()->agent(moderators: true, admin: Auth::user()->role !== UserRole::MODERATOR)->exists() ? null : false);
 

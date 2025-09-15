@@ -2,8 +2,8 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\BulkAction;
 use App\Filament\Actions\Concerns\ApproveAccount;
+use Filament\Tables\Actions\BulkAction;
 
 class ApproveAccountBulkAction extends BulkAction
 {

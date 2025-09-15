@@ -2,7 +2,6 @@
 
 namespace App\Filament\Clusters\Requests\Resources;
 
-use Filament\Actions\ActionGroup;
 use App\Enums\RequestClass;
 use App\Enums\UserRole;
 use App\Filament\Actions\Tables\AssignRequestAction;
@@ -23,6 +22,7 @@ use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListInquiries
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\NewInquiry;
 use App\Filament\Resources\RequestResource;
 use Filament\Actions\ForceDeleteAction;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Support\Facades\Auth;
 
 class InquiryResource extends RequestResource
@@ -31,7 +31,7 @@ class InquiryResource extends RequestResource
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-question-mark-circle';
+    protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 
     protected static ?string $label = 'Inquiries';
 

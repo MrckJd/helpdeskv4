@@ -2,13 +2,13 @@
 
 namespace App\Filament\Actions\Tables;
 
-use Filament\Actions\Action;
-use Filament\Support\Enums\Width;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Models\Request;
 use Exception;
 use Filament\Forms\Components\Radio;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
 class ReclassifyRequestAction extends Action
@@ -29,7 +29,7 @@ class ReclassifyRequestAction extends Action
 
         $this->modalDescription('Reclassify this request to best fit its nature.');
 
-        $this->modalWidth(Width::ExtraLarge);
+        $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->successNotificationTitle('Request reclassified');
 
