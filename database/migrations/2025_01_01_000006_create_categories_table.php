@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('name');
+            $table->string('standard_type')->nullable();
             $table->foreignUlid('organization_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->softDeletes()->index();
             $table->timestamps();

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Clusters\Management\Resources;
 
+use App\Enums\Standardization;
 use App\Filament\Clusters\Management;
 use App\Filament\Clusters\Management\Resources\CategoryResource\Pages;
 use App\Filament\Filters\OrganizationFilter;
@@ -16,6 +17,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
 
 class CategoryResource extends Resource
 {
@@ -57,6 +59,11 @@ class CategoryResource extends Resource
                         modifyRuleUsing: fn ($rule, $get) => $rule->withoutTrashed()
                             ->where('organization_id', $get('organization'))
                     ),
+                Forms\Components\Select::make('standard_type')
+                    ->label('Standard Type')
+                    ->columnSpanFull()
+                    ->options(Standardization::class)
+                    ->native(false),
                 Forms\Components\Repeater::make('subcategories')
                     ->relationship()
                     ->columnSpanFull()
@@ -80,7 +87,7 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->description(fn (Category $category) => $panel === 'root' ? $category->organization->code : null)
+                    ->description(fn (Category $category) => $panel === 'root' ? new HtmlString('<div class="flex flex-col text-sm text-gray-500 dark:text-gray-400"><p>'.$category->standard_type?->getLabel().'</p><p>('.$category->organization?->code.')</p></div>') : $category->standard_type?->getLabel())
                     ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('subcategories.name')

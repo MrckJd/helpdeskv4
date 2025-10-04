@@ -10,6 +10,7 @@ enum UserRole: string implements HasDescription, HasLabel
     case ROOT = 'root';
     case ADMIN = 'admin';
     case MODERATOR = 'moderator';
+    case AUDITOR = 'auditor';
     case AGENT = 'agent';
     case USER = 'user';
 
@@ -28,6 +29,7 @@ enum UserRole: string implements HasDescription, HasLabel
             self::MODERATOR => 'User with access to moderate incoming requests.',
             self::AGENT => 'User with access to handle incoming requests.',
             self::USER => 'User with standard access to the system.',
+            self::AUDITOR => 'User with read-only access to the client feedback.',
             default => '',
         };
     }

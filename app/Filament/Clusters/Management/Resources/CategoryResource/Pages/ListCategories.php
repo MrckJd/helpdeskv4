@@ -2,6 +2,7 @@
 
 namespace App\Filament\Clusters\Management\Resources\CategoryResource\Pages;
 
+use App\Filament\Actions\ViewQrCodeAction;
 use App\Filament\Clusters\Management\Resources\CategoryResource;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
@@ -20,6 +21,7 @@ class ListCategories extends ListRecords
                 ->createAnother(false)
                 ->slideOver()
                 ->modalWidth(MaxWidth::Large),
+            ViewQrCodeAction::make(),
         ];
     }
 
