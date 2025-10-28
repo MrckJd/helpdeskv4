@@ -41,6 +41,8 @@ class PurgeAttachmentFiles implements ShouldQueue
             $purgable->lazyById()->each->purge();
         };
 
+        
+
         $execute();
     }
 }

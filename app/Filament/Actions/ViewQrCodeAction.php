@@ -41,5 +41,18 @@ class ViewQrCodeAction extends Action
                 'qr' => QrCode::size(200)->generate(url('/') . '/feedback/' . request()->user()->organization_id . '/feedback'),
             ]);
         });
+
+        $this->action(function () {
+                $filename = 'QR-' . request()->user()->organization->code . '.png';
+                $qrCode = QrCode::format('png')
+                    ->size(1024)
+                    ->generate(url('/') . '/feedback/' . request()->user()->organization_id . '/feedback');
+
+                return response()->streamDownload(
+                    fn () => print($qrCode),
+                    $filename,
+                    ['Content-Type' => 'image/png']
+                );
+            });
     }
 }

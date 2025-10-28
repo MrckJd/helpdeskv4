@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('responses', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->string('name');
-            $table->string('standard_type');
-            $table->string('service_type');
-            $table->foreignUlid('organization_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->softDeletes()->index();
+            $table->foreignUlid('feedback_id')->constrained()->restrictOnDelete()->restrictOnUpdate();
+            $table->string('question_type');
+            $table->string('question');
+            $table->integer('answer');
             $table->timestamps();
-            $table->unique(['name', 'organization_id']);
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('responses');
     }
 };

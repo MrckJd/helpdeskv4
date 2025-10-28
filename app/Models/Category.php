@@ -3,9 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ActionStatus;
-use App\Enums\Standardization;
+use App\Enums\Feedback;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class Category extends Model
 {
@@ -23,10 +21,12 @@ class Category extends Model
         'name',
         'standard_type',
         'organization_id',
+        'service_type',
     ];
 
     protected $casts = [
-        'standard_type' => Standardization::class,
+        'standard_type' => Feedback::class,
+        'service_type' => 'array',
     ];
 
     public static function booted()

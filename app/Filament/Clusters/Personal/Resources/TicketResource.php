@@ -11,6 +11,7 @@ use App\Filament\Actions\Tables\ReopenRequestAction;
 use App\Filament\Actions\Tables\ResolveRequestAction;
 use App\Filament\Actions\Tables\ResubmitRequestAction;
 use App\Filament\Actions\Tables\ShowRequestAction;
+use App\Filament\Actions\Tables\TakeFeedbackAction;
 use App\Filament\Actions\Tables\UndoRecentAction;
 use App\Filament\Actions\Tables\UpdateRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
@@ -53,6 +54,7 @@ class TicketResource extends RequestResource
             ShowRequestAction::make(),
             ViewRequestHistoryAction::make(),
             ActionGroup::make([
+                TakeFeedbackAction::make(),
                 UndoRecentAction::make(),
                 ReopenRequestAction::make(),
                 UpdateRequestAction::make(),

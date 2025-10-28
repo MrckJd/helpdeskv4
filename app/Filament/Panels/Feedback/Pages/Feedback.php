@@ -2,11 +2,12 @@
 
 namespace App\Filament\Panels\Feedback\Pages;
 
+use App\Enums\Feedback as EnumsFeedback;
 use App\Models\Category;
 use App\Models\Feedback as ModelsFeedback;
 use App\Models\Organization;
+use App\Models\Request;
 use Exception;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\MarkdownEditor;
@@ -22,10 +23,9 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\InteractsWithFormActions;
-use Filament\Pages\Page;
 use Filament\Pages\SimplePage;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
 
@@ -41,6 +41,8 @@ class Feedback extends SimplePage implements HasForms
 
     public string|null|Organization $organization = null;
 
+    public string|null|Request $request = null;
+
     public array $data = [];
 
     public function mount(string|null $organization = null): void
@@ -48,6 +50,10 @@ class Feedback extends SimplePage implements HasForms
         $this->organization = Organization::findOrFail($organization);
         $this->form->fill();
         $this->data['date'] = now()->toDateString();
+
+        if(request()->has('request')){
+            $this->request = Request::findOrFail(request()->get('request'));
+        }
     }
 
     public static function canAccess(): bool
@@ -66,17 +72,69 @@ class Feedback extends SimplePage implements HasForms
 
         try{
             $this->form->validate();
-            ModelsFeedback::create([
-                'feedbacks' => $this->data,
-                'category_id' => $this->data['category_id'],
+
+            DB::beginTransaction();
+
+            $cc = [
+                'CC1' => $this->data['CC1'],
+                'CC2' => $this->data['CC2'],
+                'CC3' => $this->data['CC3'],
+            ];
+
+            $sqd = [
+                'SQD0' => $this->data['SQD0'],
+                'SQD1' => $this->data['SQD1'],
+                'SQD2' => $this->data['SQD2'],
+                'SQD3' => $this->data['SQD3'],
+                'SQD4' => $this->data['SQD4'],
+                'SQD5' => $this->data['SQD5'],
+                'SQD6' => $this->data['SQD6'],
+                'SQD7' => $this->data['SQD7'],
+                'SQD8' => $this->data['SQD8'],
+            ];
+            $category_id = explode('-',$this->data['category_id']);
+            $feedback_id = ModelsFeedback::create([
+                'email' => $this->data['email'],
+                'client_type' => $this->data['client_type'] ?? null,
+                'age' => $this->data['age'] ?? null,
+                'gender' => $this->data['gender'] ?? null,
+                'residence' => $this->data['residence'],
+                'service_type' => $this->data['service_type'] ?? null,
+                'category_id' => $category_id[0],
+                'service_type' => $category_id[1],
+                'expectation' => $this->data['expectation'] ?? null,
+                'strength' => $this->data['strength'] ?? null,
+                'improvement' => $this->data['improvement'] ?? null,
                 'organization_id' => $this->organization->id,
+                'request_id' => $this->request->id ?? null,
+                'user_id' => $this->request->user_id ?? null,
             ]);
+
+            foreach($cc as $question => $answer){
+                $feedback_id->responses()->create([
+                    'question_type' => 'Citizen Charter',
+                    'question' => $question,
+                    'answer' => $answer,
+                ]);
+            }
+
+            foreach($sqd as $question => $answer){
+                $feedback_id->responses()->create([
+                    'question_type' => 'Service Quality Dimension',
+                    'question' => $question,
+                    'answer' => $answer,
+                ]);
+            }
+
+            DB::commit();
             $this->form->fill();
 
             return redirect()->route('filament.feedback.thank-you', ['organization' => $this->organization->id]);
 
 
             }catch(Exception $e){
+                DB::rollBack();
+
                 Notification::make()
                 ->title('An '.$e->getMessage().' error occurred while submitting your feedback. Please try again.')
                 ->danger()
@@ -86,28 +144,24 @@ class Feedback extends SimplePage implements HasForms
 
     }
 
-    public function getServiceType(): ?array
-    {
-        $organization_id = $this->organization->id ?? null;
-        return Category::where('organization_id', $organization_id)->pluck('name', 'id')->toArray();
-    }
-
     public function form (Form $form): Form
     {
         return $form
             ->statePath('data')
             ->schema([
                 Wizard::make([
-                    Step::make('Privacy')
+                    Step::make('Privacy Policy')
                         ->schema([
                             TextInput::make('email')
                                 ->email()
                                 ->label('Email Address')
                                 ->placeholder('Email Address')
-                                ->required(),
+                                ->required()
+                                ->default(fn () => request()->user()->email ?? null),
                             DatePicker::make('date')
                                 ->label('Date')
-                                ->required(),
+                                ->required()
+                                ->disabled(),
                             Checkbox::make('consent')
                                 ->accepted()
                                 ->required()
@@ -135,7 +189,7 @@ class Feedback extends SimplePage implements HasForms
                                 ])
                                 ->extraAttributes(['class' => 'place-self-start mt-1']),
                         ]),
-                    Step::make('Personal')
+                    Step::make('Personal Information')
                         ->columns(2)
                         ->schema([
                             Select::make('client_type')
@@ -143,14 +197,12 @@ class Feedback extends SimplePage implements HasForms
                                 ->label('Client Type')
                                 ->required()
                                 ->placeholder('Select your client type')
-                                ->options([
-                                    'citizen'=>'Citizen',
-                                    'business'=>'Business',
-                                    'goverment'=>'Government or another Agency',]),
+                                ->options(EnumsFeedback::clientTypesLabel())
+                                ->default(fn () => request()->user() ? 'government' : null),
+
                             Select::make('gender')
                                 ->label('Gender')
                                 ->placeholder('Select your client type')
-
                                 ->options([
                                     'male' => 'Male',
                                     'female' => 'Female',
@@ -174,7 +226,16 @@ class Feedback extends SimplePage implements HasForms
                                 ->required()
                                 ->placeholder('Select the service availed')
                                 ->reactive()
-                                ->options($this->getServiceType() ?? []),
+                                ->native(false)
+                                ->allowHtml()
+                                ->options(function(){
+                                   return collect($this->organization->categories)->flatMap(function($category){
+                                        return collect($category->service_type)->mapWithKeys(function($service_type) use ($category){
+                                            $service_type_enums=EnumsFeedback::from($service_type)->getLabel();
+                                            return [$category->id.'-'.$service_type => "<div class='flex flex-col'><span>{$category->name}</span><span class='italic opacity-50'>{$service_type_enums} Service</span></div>"];
+                                        });
+                                   });
+                                }),
                             Section::make('Citizen Charter')
                                 ->description('INSTRUCTIONS: Choose your answer to the Citizen’s Charter (CC) questions. The Citizen’s Charter is an official document that reflects the services of a government agency/office including its requirements, fees, and processing times among others.')
                                 ->schema([
@@ -323,6 +384,25 @@ class Feedback extends SimplePage implements HasForms
                                 ])
 
                         ]),
+                    Step::make('Suggestions')
+                        ->schema([
+                            Radio::make('expectation')
+                                ->label('Did we meet your expectations?')
+                                ->options([
+                                    '1' => 'Exceeded Expectations',
+                                    '2' => 'Met Expectations',
+                                    '3' => 'Fell Short',
+                                ])
+                                ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20']),
+                            MarkdownEditor::make('strength')
+                                ->label('What did you like the most about our service?')
+                                ->placeholder('Your answer here...')
+                                ->columnSpanFull(),
+                            MarkdownEditor::make('improvement')
+                                ->label('Comments/Suggestions on how we can further improve our services (optional)')
+                                ->placeholder('Your answer here...')
+                                ->columnSpanFull(),
+                        ])
                     ])
                     ->submitAction(new HtmlString(Blade::render(<<<BLADE
                         <x-filament::button type="submit" size="sm">

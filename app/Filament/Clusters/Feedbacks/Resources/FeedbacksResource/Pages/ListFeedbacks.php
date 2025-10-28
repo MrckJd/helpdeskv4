@@ -10,4 +10,5 @@ class ListFeedbacks extends ListRecords
 {
     protected static string $resource = FeedbacksResource::class;
 
+
 }

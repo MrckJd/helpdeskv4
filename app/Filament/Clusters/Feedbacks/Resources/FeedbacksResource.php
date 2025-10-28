@@ -2,25 +2,24 @@
 
 namespace App\Filament\Clusters\Feedbacks\Resources;
 
-use App\Filament\Clusters\Feedback;
 use App\Filament\Clusters\Feedbacks;
 use App\Filament\Clusters\Feedbacks\Resources\FeedbacksResource\Pages;
-use App\Filament\Clusters\Feedbacks\Resources\FeedbacksResource\RelationManagers;
+use App\Jobs\GenerateFeedbackForm;
 use App\Models\Feedback as FeedbackModel;
-use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Spatie\Browsershot\Browsershot;
+use Spatie\LaravelPdf\Enums\Unit;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class FeedbacksResource extends Resource
 {
     protected static ?string $model = FeedbackModel::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'gmdi-feedback-r';
 
     protected static ?string $cluster = Feedbacks::class;
 
@@ -28,7 +27,7 @@ class FeedbacksResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('feedbacks.email')
+                TextColumn::make('email')
                     ->label('Email')
                     ->searchable()
                     ->sortable(),
@@ -36,35 +35,41 @@ class FeedbacksResource extends Resource
                     ->label('Service Type')
                     ->searchable()
                     ->sortable()
-                    ->getStateUsing(fn ($record) => $record->category?->name ?? 'N/A'),
+                    ->getStateUsing(fn ($record) => $record->category?->name),
                 TextColumn::make('organization.code')
                     ->label('Organization')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('feedbacks.date')
+                TextColumn::make('sqdAverage')
+                    ->label('SQD Average')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 2) : 'N/A')
+                    ->sortable(),
+                TextColumn::make('created_at')
                     ->label('Date')
                     ->date()
                     ->searchable()
+                    ->toggleable(isToggledHiddenByDefault:true)
                     ->sortable(),
                 ])
             ->filters([
-                //
-            ]);
-    }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
+            ])
+            ->recordUrl(fn ($record): string => static::getUrl('view', ['record' => $record]))
+            ->bulkActions([
+                BulkAction::make('generated-pdf')
+                    ->label('Generate')
+                    ->icon('gmdi-picture-as-pdf')
+                    ->action(function($records){
+                        return GenerateFeedbackForm::dispatch($records);
+                    })
+            ]);
     }
 
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListFeedbacks::route('/'),
-            'create' => Pages\CreateFeedbacks::route('/create'),
-            'edit' => Pages\EditFeedbacks::route('/{record}/edit'),
+            'view' => Pages\FeedbackForm::route('/{record}'),
         ];
     }
 }

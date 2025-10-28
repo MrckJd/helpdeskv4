@@ -2,10 +2,11 @@
 
 namespace App\Filament\Clusters\Management\Resources;
 
-use App\Enums\Standardization;
+use App\Enums\Feedback;
 use App\Filament\Clusters\Management;
 use App\Filament\Clusters\Management\Resources\CategoryResource\Pages;
 use App\Filament\Filters\OrganizationFilter;
+use App\Filament\Helpers\ColorToHex;
 use App\Models\Category;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -62,7 +63,21 @@ class CategoryResource extends Resource
                 Forms\Components\Select::make('standard_type')
                     ->label('Standard Type')
                     ->columnSpanFull()
-                    ->options(Standardization::class)
+                    ->options(Feedback::standardizationsLabel())
+                    ->native(false),
+                Forms\Components\Select::make('service_type')
+                    ->label('Service Type')
+                    ->columnSpanFull()
+                    ->multiple()
+                    ->allowHtml()
+                    ->required()
+                    ->options(function () {
+                        return collect(Feedback::serviceTypesLabel())->mapWithKeys(
+                            function ($label, $value){
+                                $description = Feedback::serviceTypesDescription()[$value] ?? "No description available.";
+                                return [$value => "<h1 class='font-bold'>{$label}</h1><i class='opacity-50'>{$description}</i>"];
+                            })->toArray();
+                    })
                     ->native(false),
                 Forms\Components\Repeater::make('subcategories')
                     ->relationship()
@@ -87,7 +102,32 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->description(fn (Category $category) => $panel === 'root' ? new HtmlString('<div class="flex flex-col text-sm text-gray-500 dark:text-gray-400"><p>'.$category->standard_type?->getLabel().'</p><p>('.$category->organization?->code.')</p></div>') : $category->standard_type?->getLabel())
+                    ->formatStateUsing(fn($record, $state)=>  $state.' ('. $record->standard_type?->getLabel(). ')')
+                    ->description(
+                                    function(Category $category) use ($panel) {
+                                            $organization_code = '';
+                                            $service_type=collect($category->service_type)->map(function($type){
+                                                $feedbackServiceType = FeedBack::from($type)->getLabel();
+
+                                                return <<<HTML
+                                                            <span class="px-2 rounded-md text-sm border border-amber-600/40 bg-amber-600/10 text-amber-600" >{$feedbackServiceType} Service</span>
+                                                        HTML;
+                                            })->join(' ');
+                                            if($panel === 'root')
+                                                $organization_code = $category->organization->code;
+
+                                            $html = <<<HTML
+
+                                                        <div>
+                                                            {$service_type}
+                                                            <div>
+                                                                <span class="italic opacity-50">{$organization_code}</span>
+                                                            </div>
+                                                        </div>
+                                                    HTML;
+                                            return new HTMLString($html);
+                                            }
+                                        )
                     ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('subcategories.name')
