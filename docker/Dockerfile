@@ -10,7 +10,8 @@ ARG POSTGRES_VERSION=17
 WORKDIR /var/www/html
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=UTC ENV SUPERVISOR_PHP_COMMAND="/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=80"
+ENV TZ=UTC
+ENV SUPERVISOR_PHP_COMMAND="/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=80"
 ENV SUPERVISOR_PHP_USER="sail"
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -78,31 +79,35 @@ RUN apt-get update && apt-get upgrade -y \
         xdg-utils \
     && apt-get -y autoremove \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* RUN mkdir -p /usr/share/fonts/truetype/urbanist
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-    RUN mkdir -p /usr/share/fonts/truetype/urbanist && \
-        curl -L -o /tmp/urbanist.zip https://github.com/google/fonts/raw/main/ofl/urbanist/Urbanist%5Bwght%5D.ttf && \
-        mv /tmp/urbanist.zip /usr/share/fonts/truetype/urbanist/Urbanist.ttf && \
-        fc-cache -fv
+RUN mkdir -p /usr/share/fonts/truetype/urbanist && \
+    curl -L -o /tmp/urbanist.zip https://github.com/google/fonts/raw/main/ofl/urbanist/Urbanist%5Bwght%5D.ttf && \
+    mv /tmp/urbanist.zip /usr/share/fonts/truetype/urbanist/Urbanist.ttf && \
+    fc-cache -fv
 
-    ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-    ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
 
-    RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.4
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
+# ENV PUPPETEER_CONFIG_DIR=/tmp/puppeteer
+# ENV PUPPETEER_CACHE_DIR=/tmp/puppeteer
+# ENV HOME=/tmp/puppeteer
 
-    RUN userdel -r ubuntu
-    RUN groupadd --force -g $WWWGROUP sail
-    RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
+RUN setcap "cap_net_bind_service=+ep" /usr/bin/php8.4
 
-    RUN npm install -g puppeteer
-    RUN su - sail -c "npm install puppeteer"
+RUN userdel -r ubuntu
+RUN groupadd --force -g $WWWGROUP sail
+RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u 1337 sail
 
-    COPY start-container /usr/local/bin/start-container
-    COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-    COPY php.ini /etc/php/8.4/cli/conf.d/99-sail.ini
-    RUN chmod +x /usr/local/bin/start-container
-    RUN crontab -l | { cat; echo "* * * * * /usr/bin/php /var/www/html/artisan schedule:run >> /dev/null 2>&1"; } | crontab -
+RUN npm install -g puppeteer
+RUN su - sail -c "npm install puppeteer"
 
-    EXPOSE 80/tcp
+COPY start-container /usr/local/bin/start-container
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY php.ini /etc/php/8.4/cli/conf.d/99-sail.ini
+RUN chmod +x /usr/local/bin/start-container
+RUN crontab -l | { cat; echo "* * * * * /usr/bin/php /var/www/html/artisan schedule:run >> /dev/null 2>&1"; } | crontab -
 
-    ENTRYPOINT ["start-container"]
+EXPOSE 80/tcp
+
+ENTRYPOINT ["start-container"]

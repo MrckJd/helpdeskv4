@@ -43,7 +43,7 @@ class FeedbackForm extends ViewRecord
 
                     $filename = 'feedback_' . $record->id  . now()->format('Y-m-d') . '.pdf';
 
-                    $pdf = Pdf::view('filament.panels.feedback.feedback-form', ['record' => $record])
+                    $pdf = Pdf::view('filament.panels.feedback.feedback-form', ['record' => $record, 'preview' => true])
                         ->margins(10, 10, 10, 10)
                         ->paperSize(8.5, 13, Unit::Inch)
                         ->withBrowsershot(function (Browsershot $browsershot) {

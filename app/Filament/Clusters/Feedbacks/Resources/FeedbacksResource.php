@@ -2,6 +2,7 @@
 
 namespace App\Filament\Clusters\Feedbacks\Resources;
 
+use App\Filament\Actions\Tables\GenerateFeedbackReport;
 use App\Filament\Clusters\Feedbacks;
 use App\Filament\Clusters\Feedbacks\Resources\FeedbacksResource\Pages;
 use App\Jobs\GenerateFeedbackForm;
@@ -10,7 +11,6 @@ use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Enums\Unit;
 use Spatie\LaravelPdf\Facades\Pdf;
@@ -56,12 +56,32 @@ class FeedbacksResource extends Resource
             ])
             ->recordUrl(fn ($record): string => static::getUrl('view', ['record' => $record]))
             ->bulkActions([
-                BulkAction::make('generated-pdf')
-                    ->label('Generate')
-                    ->icon('gmdi-picture-as-pdf')
-                    ->action(function($records){
-                        return GenerateFeedbackForm::dispatch($records);
-                    })
+                GenerateFeedbackReport::make(),
+
+                // BulkAction::make('generated-pdf')
+                //     ->label('Generate')
+                //     ->icon('gmdi-picture-as-pdf')
+                //     ->action(function($records){
+                //          $pdf = Pdf::view('filament.panels.feedback.feedback-form', ['records' => $records,'preview' => false])
+                //             ->margins(10, 10, 10, 10)
+                //             ->paperSize(8.5, 13, Unit::Inch)
+                //             ->withBrowsershot(function (Browsershot $browsershot) {
+                //                 return $browsershot
+                //                     ->noSandbox()
+                //                     ->emulateMedia('print')
+                //                     ->portrait()
+                //                     ->timeout(120)
+                //                     ->showBackground();
+                //             })
+                //             ->base64();
+
+                //             return response()->streamDownload(
+                //                 function() use ($pdf) {
+                //                     echo base64_decode($pdf);
+                //                 },
+                //                 'feedback_form_'.now()->format('Y_m_d_H_i_s').'.pdf',
+                //             );
+                //         })
             ]);
     }
 
@@ -73,3 +93,4 @@ class FeedbacksResource extends Resource
         ];
     }
 }
+

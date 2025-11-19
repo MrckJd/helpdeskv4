@@ -2,12 +2,11 @@
 
 namespace App\Jobs;
 
-use Filament\Notifications\Notification;
+use App\Events\FeedbackNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Queue\Queueable;
 use Spatie\Browsershot\Browsershot;
-use Spatie\LaravelPdf\Enums\Format;
 use Spatie\LaravelPdf\Enums\Unit;
 use Spatie\LaravelPdf\Facades\Pdf;
 
@@ -24,8 +23,13 @@ class GenerateFeedbackForm implements ShouldQueue
 
     public function handle(): void
     {
+
         $directory = storage_path('app/public/PDF');
-        $filename = $directory.'/feedback__' . now()->format('Y-m-d') . '.pdf';
+        $filename = $directory.'/feedback__' . rand() . '.pdf';
+
+        if(storage_path('app/public/PDF') && !file_exists(storage_path('app/public/PDF'))){
+            mkdir(storage_path('app/public/PDF'), 0755, true);
+        }
 
         Pdf::view('filament.panels.feedback.feedback-form', ['records' => $this->feedbacks,'preview' => false])
             ->margins(10, 10, 10, 10)
@@ -39,6 +43,5 @@ class GenerateFeedbackForm implements ShouldQueue
                     ->showBackground();
             })
             ->save($filename);
-
     }
 }

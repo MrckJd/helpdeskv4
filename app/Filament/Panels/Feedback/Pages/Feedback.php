@@ -272,7 +272,7 @@ class Feedback extends SimplePage implements HasForms
                                 ->description('INSTRUCTIONS:  For SQD 0-8, please Choose on the column that best corresponds to your answer.')
                                 ->schema([
                                     View::make('sqdoptions')
-                                        ->view('filament.panels.feedback.sqdlegend'),
+                                        ->view('filament.panels.feedback..components.sqdlegend'),
                                     Radio::make('SQD0')
                                         ->label('SQD0. I am satisfied with the service that I availed.')
                                         ->options([
