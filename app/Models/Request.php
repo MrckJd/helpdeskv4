@@ -149,4 +149,9 @@ class Request extends Model
         return $this->hasMany(Record::class)
             ->latest();
     }
+
+    public function feedback(): HasOne
+    {
+        return $this->hasOne(Feedback::class);
+    }
 }

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignUlid('request_id')->constrained('requests')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignUlid('assigned_id')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignUlid('assigner_id')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string('response')->nullable();
+            $table->timestamp('responded_at')->nullable();
             $table->timestamps();
             $table->unique(['request_id', 'assigned_id']);
         });

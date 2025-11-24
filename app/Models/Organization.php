@@ -58,4 +58,9 @@ class Organization extends Model
     {
         return $this->hasMany(Request::class);
     }
+
+    public function feedbacks(): HasMany
+    {
+        return $this->hasMany(Feedback::class);
+    }
 }

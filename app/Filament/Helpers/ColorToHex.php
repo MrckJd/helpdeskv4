@@ -12,8 +12,8 @@ class ColorToHex
         return static::convert($color, $shade);
     }
 
-    public static function convert(string $color = 'primary', int $shade = 500): string
+    public static function convert(string $color = 'primary', int $shade = 500, string $alpha = "ff"): string
     {
-        return Rgb::fromString('rgb('.FilamentColor::getColors()[$color][$shade].')')->toHex();
+        return Rgb::fromString('rgb('.FilamentColor::getColors()[$color][$shade].')')->toHex($alpha);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ActionStatus;
+use App\Enums\Feedback;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,7 +19,14 @@ class Category extends Model
 
     protected $fillable = [
         'name',
+        'standard_type',
         'organization_id',
+        'service_type',
+    ];
+
+    protected $casts = [
+        'standard_type' => Feedback::class,
+        'service_type' => 'array',
     ];
 
     public static function booted()
@@ -41,6 +49,11 @@ class Category extends Model
     public function subcategories(): HasMany
     {
         return $this->hasMany(Subcategory::class);
+    }
+
+    public function feedbacks(): HasMany
+    {
+        return $this->hasMany(Feedback::class);
     }
 
     public function requests(): HasManyThrough

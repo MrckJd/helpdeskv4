@@ -21,6 +21,7 @@ class LoginResponse implements Responsable
             UserRole::MODERATOR => 'filament.moderator.pages.dashboard',
             UserRole::AGENT => 'filament.agent.pages.dashboard',
             UserRole::USER => 'filament.user.pages.dashboard',
+            UserRole::AUDITOR => 'filament.auditor.pages.dashboard',
             default => 'filament.home.pages.',
         };
 
