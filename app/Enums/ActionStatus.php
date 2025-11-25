@@ -19,6 +19,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     case RECALLED = 'recalled';
     case QUEUED = 'queued';
     case SUSPENDED = 'suspended';
+    case REINSTATED = 'reinstated';
     case ASSIGNED = 'assigned';
     case ACCEPTED = 'accepted';
     case REJECTED = 'rejected';
@@ -43,6 +44,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::COMPLETED->value,
             self::STARTED->value,
             self::SUSPENDED->value,
+            self::REINSTATED->value,
             self::CLOSED->value,
             self::RESPONDED->value,
             self::STALE->value,
@@ -66,6 +68,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::REOPENED => 'info',
             self::STARTED => 'info',
             self::SUSPENDED => 'warning',
+            self::REINSTATED => 'info',
             self::SUBMITTED => 'success',
             self::RECALLED => 'warning',
             self::ACCEPTED => 'success',
@@ -90,6 +93,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::COMPLETED => 'The request has been completed.',
             self::STARTED => 'The request has been taken up and is in progress.',
             self::SUSPENDED => 'The request has been suspended and is awaiting further action.',
+            self::REINSTATED => 'The request has been reinstated after being suspended.',
             self::SUBMITTED => 'The request has been published by the user.',
             self::RECALLED => 'The request has been retracted by the requestor and is waiting to be republished.',
             self::COMPLIED => 'The user submitted the lacking documents.',
@@ -110,6 +114,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::COMPLETED => 'gmdi-task-alt-o',
             self::STARTED => 'gmdi-alarm-o',
             self::SUSPENDED => 'gmdi-front-hand-o',
+            self::REINSTATED => 'gmdi-repartition-o',
             self::SUBMITTED => 'gmdi-publish-o',
             self::RECALLED => 'gmdi-settings-backup-restore-o',
             self::ASSIGNED => 'gmdi-supervisor-account-o',
@@ -146,6 +151,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
                 'completed' => 'completion',
                 'cancelled' => 'cancellation',
                 'suspended' => 'suspension',
+                'reinstated' => 'reinstatement',
                 'recalled' => 'recall',
                 'assigned' => 'assignment',
                 'rejected' => 'rejection',
@@ -160,6 +166,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
                 'cancelled' => 'cancel',
                 'declined' => 'decline',
                 'completed' => 'complete',
+                'reinstated' => 'reinstate',
                 'submitted' => 'submit',
                 'tagged' => 'tag',
                 'closed' => 'close',
