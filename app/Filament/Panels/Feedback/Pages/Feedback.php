@@ -228,7 +228,7 @@ class Feedback extends SimplePage implements HasForms
                                 ->reactive()
                                 ->native(false)
                                 ->allowHtml()
-                                ->options(function(){
+                                ->options(function (){
                                    return collect($this->organization->categories)->flatMap(function($category){
                                         return collect($category->service_type)->mapWithKeys(function($service_type) use ($category){
                                             $service_type_enums=EnumsFeedback::from($service_type)->getLabel();
@@ -404,6 +404,7 @@ class Feedback extends SimplePage implements HasForms
                                 ->columnSpanFull(),
                         ])
                     ])
+                    ->startOnStep(3)
                     ->submitAction(new HtmlString(Blade::render(<<<BLADE
                         <x-filament::button type="submit" size="sm">
                             Submit Feedback
