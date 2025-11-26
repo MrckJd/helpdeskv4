@@ -79,7 +79,7 @@ class ReclassifyRequestAction extends Action
             return $request->action?->status->finalized() ?:
                 $request->actions->some(fn (\App\Models\Action $action) => in_array($action->status, [
                     ActionStatus::STARTED,
-                    ActionStatus::RESPONDED,
+                    ActionStatus::REPLIED,
                 ], true));
         });
     }

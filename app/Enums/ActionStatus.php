@@ -27,12 +27,12 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
     case REOPENED = 'reopened';
     case RECLASSIFIED = 'reclassified';
     case RECATEGORIZED = 'recategorized';
-    case RESPONDED = 'responded';
+    case REPLIED = 'replied';
     case TAGGED = 'tagged';
     case CLOSED = 'closed';
 
     case ON_HOLD = 'on_hold';           // Placeholder only
-    case IN_PROGRESS = 'in_progress';   // Placeholder only
+    case IN_PROGRESS = 'in_progress';
 
     public static function majorActions(): array
     {
@@ -46,7 +46,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::SUSPENDED->value,
             self::REINSTATED->value,
             self::CLOSED->value,
-            self::RESPONDED->value,
+            self::REPLIED->value,
             self::STALE->value,
             self::COMPLIED->value,
             self::REOPENED->value,
@@ -68,15 +68,16 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::REOPENED => 'info',
             self::STARTED => 'info',
             self::SUSPENDED => 'warning',
-            self::REINSTATED => 'info',
             self::SUBMITTED => 'success',
             self::RECALLED => 'warning',
             self::ACCEPTED => 'success',
             self::REJECTED,
             self::ASSIGNED,
             self::QUEUED => 'info',
+            self::REINSTATED => 'info',
             self::COMPLIED => 'success',
             self::CLOSED => 'gray',
+            self::IN_PROGRESS => 'info',
             self::ON_HOLD => 'warning',
             default => 'gray'
         };
@@ -93,8 +94,8 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::COMPLETED => 'The request has been completed.',
             self::STARTED => 'The request has been taken up and is in progress.',
             self::SUSPENDED => 'The request has been suspended and is awaiting further action.',
-            self::REINSTATED => 'The request has been reinstated after being suspended.',
             self::SUBMITTED => 'The request has been published by the user.',
+            self::REINSTATED => 'The request has been reinstated after being suspended.',
             self::RECALLED => 'The request has been retracted by the requestor and is waiting to be republished.',
             self::COMPLIED => 'The user submitted the lacking documents.',
             self::REJECTED => 'The request assignment has been rejected.',
@@ -114,7 +115,6 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::COMPLETED => 'gmdi-task-alt-o',
             self::STARTED => 'gmdi-alarm-o',
             self::SUSPENDED => 'gmdi-front-hand-o',
-            self::REINSTATED => 'gmdi-repartition-o',
             self::SUBMITTED => 'gmdi-publish-o',
             self::RECALLED => 'gmdi-settings-backup-restore-o',
             self::ASSIGNED => 'gmdi-supervisor-account-o',
@@ -123,10 +123,11 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::COMPLIED => 'gmdi-fact-check-o',
             self::RECATEGORIZED => 'gmdi-move-down-o',
             self::RECLASSIFIED => 'gmdi-read-more-o',
+            self::REINSTATED => 'gmdi-repartition-o',
             self::CLOSED => 'gmdi-close-o',
             self::REOPENED => 'gmdi-replay-o',
             self::TAGGED => 'gmdi-sell-o',
-            self::RESPONDED => 'gmdi-chat-o',
+            self::REPLIED => 'gmdi-chat-o',
             self::IN_PROGRESS => 'gmdi-sync-o',
             self::ON_HOLD => 'gmdi-pause-o',
             default => 'gmdi-circle-o',
@@ -155,7 +156,7 @@ enum ActionStatus: string implements HasColor, HasDescription, HasIcon, HasLabel
                 'recalled' => 'recall',
                 'assigned' => 'assignment',
                 'rejected' => 'rejection',
-                'responded' => 'response',
+                'replied' => 'reply',
                 'reclassified' => 'reclassification',
                 'recategorized' => 'recategorization',
                 'tagged' => 'tag',
