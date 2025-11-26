@@ -45,9 +45,9 @@ trait HasInquiryTabs
                     ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::ASSIGNED)->count()),
             ] : []),
             'processing' => Tab::make('Processing')
-                ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::RESPONDED))
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereRelation('action', 'status', ActionStatus::REPLIED))
                 ->icon(ActionStatus::IN_PROGRESS->getIcon())
-                ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::RESPONDED)->count()),
+                ->badge(fn () => $query()->whereRelation('action', 'status', ActionStatus::REPLIED)->count()),
             'completed' => Tab::make('Completed')
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('action', fn ($query) => $query->whereIn('status', [
                     ActionStatus::COMPLETED,

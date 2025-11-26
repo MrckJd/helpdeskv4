@@ -46,7 +46,7 @@ abstract class RequestResource extends Resource
                     ->state(function (Request $request) {
                         return match ($request->action?->status) {
                             ActionStatus::CLOSED => $request->action?->resolution,
-                            ActionStatus::RESPONDED,
+                            ActionStatus::REPLIED,
                             ActionStatus::STARTED => ActionStatus::IN_PROGRESS,
                             ActionStatus::SUSPENDED => ActionStatus::ON_HOLD,
                             default => $request->action?->status,

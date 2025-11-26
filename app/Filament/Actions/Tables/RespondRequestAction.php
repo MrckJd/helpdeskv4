@@ -20,7 +20,7 @@ class RespondRequestAction extends Action
 {
     use CanNotifyUsers;
 
-    protected static ?ActionStatus $requestAction = ActionStatus::RESPONDED;
+    protected static ?ActionStatus $requestAction = ActionStatus::REPLIED;
 
     protected function setUp(): void
     {
@@ -30,9 +30,9 @@ class RespondRequestAction extends Action
 
         $this->label('Respond');
 
-        $this->icon(ActionStatus::RESPONDED->getIcon());
+        $this->icon(ActionStatus::REPLIED->getIcon());
 
-        $this->modalIcon(ActionStatus::RESPONDED->getIcon());
+        $this->modalIcon(ActionStatus::REPLIED->getIcon());
 
         $this->modalDescription(fn (Request $request) => str('Respond to user\'s inquiry <span class="font-mono">#'.$request->code.'</span>')->toHtmlString());
 
@@ -79,7 +79,7 @@ class RespondRequestAction extends Action
                 ->required(),
             FileAttachment::make(),
             Placeholder::make('responses')
-                ->hidden($request->actions()->where('status', ActionStatus::RESPONDED)->doesntExist())
+                ->hidden($request->actions()->where('status', ActionStatus::REPLIED)->doesntExist())
                 ->content(view('filament.requests.history', [
                     'request' => $request,
                     'chat' => true,
@@ -98,7 +98,7 @@ class RespondRequestAction extends Action
 
                 $action = $request->actions()->create([
                     'remarks' => $data['response'],
-                    'status' => ActionStatus::RESPONDED,
+                    'status' => ActionStatus::REPLIED,
                     'user_id' => Auth::id(),
                 ]);
 
@@ -125,8 +125,8 @@ class RespondRequestAction extends Action
             $valid = $request->class === RequestClass::INQUIRY && ! $request->action->status->finalized();
 
             return $valid && match (Filament::getCurrentPanel()->getId()) {
-                'user' => $request->action->status === ActionStatus::RESPONDED,
-                'moderator', 'agent', 'admin' => in_array($request->action->status, [ActionStatus::RESPONDED, ActionStatus::ASSIGNED]) &&
+                'user' => $request->action->status === ActionStatus::REPLIED,
+                'moderator', 'agent', 'admin' => in_array($request->action->status, [ActionStatus::REPLIED, ActionStatus::ASSIGNED]) &&
                     $request->assignees->contains(Auth::user()),
                 default => false,
             };

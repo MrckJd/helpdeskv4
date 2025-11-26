@@ -82,6 +82,6 @@ class CompleteRequestAction extends Action
 
         $this->closeModalByClickingAway(false);
 
-        $this->visible(fn (Request $request) => in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::REOPENED, ActionStatus::RESPONDED]));
+        $this->visible(fn (Request $request) => in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::REOPENED, ActionStatus::REPLIED]));
     }
 }
