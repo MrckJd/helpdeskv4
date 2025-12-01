@@ -3,7 +3,7 @@
 namespace App\Filament\Clusters\Dossiers\Resources\AllDossierResource\RelationManagers;
 
 use App\Enums\ActionStatus;
-use App\Filament\Actions\Tables\ShowRequestAction;
+use App\Filament\Actions\Tables\ViewRequestAction;
 use App\Filament\Actions\Tables\ViewRequestHistoryAction;
 use App\Models\Request;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -47,7 +47,7 @@ class RequestsRelationManager extends RelationManager
                     ->mutateFormDataUsing(fn (array $data) => [...$data, 'user_id' => Auth::id()]),
             ])
             ->actions([
-                ShowRequestAction::make(),
+                ViewRequestAction::make(),
                 ViewRequestHistoryAction::make(),
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\DetachAction::make()

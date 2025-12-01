@@ -8,10 +8,9 @@ use App\Filament\Actions\Tables\CompileRequestAction;
 use App\Filament\Actions\Tables\RecallRequestAction;
 use App\Filament\Actions\Tables\ReopenRequestAction;
 use App\Filament\Actions\Tables\ResubmitRequestAction;
-use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\UndoRecentAction;
 use App\Filament\Actions\Tables\UpdateRequestAction;
-use App\Filament\Actions\Tables\ViewRequestHistoryAction;
+use App\Filament\Actions\Tables\ViewRequestAction;
 use App\Filament\Clusters\Personal;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\ListSuggestions;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\NewSuggestion;
@@ -44,8 +43,7 @@ class SuggestionResource extends RequestResource
     {
         return [
             ResubmitRequestAction::make(),
-            ShowRequestAction::make(),
-            ViewRequestHistoryAction::make(),
+            ViewRequestAction::make(),
             ActionGroup::make([
                 UndoRecentAction::make(),
                 ReopenRequestAction::make(),

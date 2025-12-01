@@ -47,7 +47,8 @@ trait CanNotifyUsers
                 ActionStatus::COMPLIED => "{$request->class->getLabel()} request #{$request->code} complied",
                 ActionStatus::COMPLETED => "{$request->class->getLabel()} request #{$request->code} completed",
                 ActionStatus::REJECTED => "{$request->class->getLabel()} request assignment rejected",
-                ActionStatus::RESPONDED => "$authenticated->name has responded to ".($authenticated->id !== $request->user_id ? 'your' : 'their')." inquiry #{$request->code}.",
+                ActionStatus::REPLIED => "$authenticated->name has replied to ".($authenticated->id !== $request->user_id ? 'your' : 'their')." inquiry #{$request->code}.",
+                ActionStatus::REINSTATED => "{$request->class->getLabel()} request #{$request->code} reinstated",
                 ActionStatus::CLOSED => "Request #{$request->code} has been closed",
                 default => null,
             };
@@ -62,6 +63,7 @@ trait CanNotifyUsers
                 ActionStatus::STARTED => "{$authenticated->name} is now processing your {$request->class->value} request.",
                 ActionStatus::SUSPENDED => "Please comply with the agent's instructions and or requirements to resume processing your {$request->class->value} request.",
                 ActionStatus::COMPLIED => "{$authenticated->name} has complied with your {$request->class->value} request.",
+                ActionStatus::REINSTATED => "{$authenticated->name} has reinstated the request after suspension.",
                 ActionStatus::COMPLETED => "The request has been completed successfully by {$authenticated->name}.",
                 ActionStatus::REJECTED => "The assignment has been rejected by {$authenticated->name} for {$request->class->value} request #{$request->code}.",
                 ActionStatus::CLOSED => match (static::$requestResolution ?? ActionResolution::tryFrom($data['resolution'])) {

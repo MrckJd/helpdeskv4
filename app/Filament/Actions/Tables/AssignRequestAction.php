@@ -137,9 +137,22 @@ class AssignRequestAction extends Action
 
         $this->visible(function (Request $request) {
             return match ($request->class) {
-                RequestClass::TICKET => in_array($request->action->status, [ActionStatus::QUEUED, ActionStatus::ASSIGNED]),
-                RequestClass::INQUIRY => in_array($request->action->status, [ActionStatus::REPLIED, ActionStatus::SUBMITTED, ActionStatus::ASSIGNED]),
-                RequestClass::SUGGESTION => in_array($request->action->status, [ActionStatus::SUBMITTED, ActionStatus::ASSIGNED]),
+                RequestClass::TICKET => in_array($request->action->status, [
+                    ActionStatus::QUEUED,
+                    ActionStatus::ASSIGNED,
+                    ActionStatus::SUSPENDED,
+                    ActionStatus::REINSTATED,
+                    ActionStatus::COMPLIED,
+                ]),
+                RequestClass::INQUIRY => in_array($request->action->status, [
+                    ActionStatus::REPLIED,
+                    ActionStatus::SUBMITTED,
+                    ActionStatus::ASSIGNED,
+                ]),
+                RequestClass::SUGGESTION => in_array($request->action->status, [
+                    ActionStatus::SUBMITTED,
+                    ActionStatus::ASSIGNED,
+                ]),
                 default => false,
             };
         });

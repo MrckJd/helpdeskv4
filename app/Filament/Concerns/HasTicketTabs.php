@@ -66,11 +66,13 @@ trait HasTicketTabs
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('action', fn ($query) => $query->whereIn('status', [
                     ActionStatus::SUSPENDED,
                     ActionStatus::COMPLIED,
+                    ActionStatus::REINSTATED,
                 ])))
                 ->icon(ActionStatus::SUSPENDED->getIcon())
                 ->badge(fn () => $query()->whereHas('action', fn ($query) => $query->whereIn('status', [
                     ActionStatus::SUSPENDED,
                     ActionStatus::COMPLIED,
+                    ActionStatus::REINSTATED,
                 ]))->count()),
             'completed' => Tab::make('Completed')
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('action', fn ($query) => $query->whereIn('status', [

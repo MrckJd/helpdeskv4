@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Panels\Auth\Pages\Profile;
 use App\Http\Middleware\Active;
 use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
@@ -23,6 +24,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+
 class AgentPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -31,6 +33,7 @@ class AgentPanelProvider extends PanelProvider
             ->id('agent')
             ->path('agent')
             ->homeUrl('/')
+            ->profile(Profile::class)
             ->brandLogo(fn () => view('banner'))
             ->font('Urbanist')
             ->colors([...Color::all(), 'gray' => Color::Neutral])
@@ -58,10 +61,11 @@ class AgentPanelProvider extends PanelProvider
                 Verify::class,
                 Approve::class,
                 Active::class,
+
                 Initialize::class,
             ])
             ->globalSearch(false)
-            ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
+            ->maxContentWidth('max-w-[1920px]')
             ->databaseTransactions()
             ->databaseNotifications()
             ->topNavigation()

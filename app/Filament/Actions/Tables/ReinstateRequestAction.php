@@ -13,29 +13,29 @@ use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Auth;
 
-class SuspendRequestAction extends Action
+class ReinstateRequestAction extends Action
 {
     use CanNotifyUsers;
 
-    protected static ?ActionStatus $requestAction = ActionStatus::SUSPENDED;
+    protected static ?ActionStatus $requestAction = ActionStatus::REINSTATED;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->name('suspend-request');
+        $this->name('reinstate-request');
 
-        $this->label('Suspend');
+        $this->label('Reinstate');
 
-        $this->icon(ActionStatus::SUSPENDED->getIcon());
+        $this->icon(static::$requestAction->getIcon());
 
-        $this->modalIcon(ActionStatus::SUSPENDED->getIcon());
+        $this->modalIcon(static::$requestAction->getIcon());
 
         $this->slideOver();
 
-        $this->modalHeading('Suspend Request');
+        $this->modalHeading('Reinstate Request');
 
-        $this->modalDescription('Suspend this on-going request. This will hold the request until requester complies with the requirements.');
+        $this->modalDescription('Reinstating a request removes its suspension status and immediately resumes the process.');
 
         $this->modalWidth(MaxWidth::ExtraLarge);
 
@@ -43,20 +43,20 @@ class SuspendRequestAction extends Action
 
         $this->modalSubmitActionLabel('Confirm');
 
-        $this->successNotificationTitle('Request suspended');
+        $this->successNotificationTitle('Request reinstated');
 
-        $this->failureNotificationTitle('Failed to suspend request');
+        $this->failureNotificationTitle('Failed to reinstate request');
 
         $this->form([
             MarkdownEditor::make('remarks')
                 ->label('Reason')
                 ->required()
-                ->helperText('Please describe the reason for suspending this request.'),
+                ->helperText('Please provide a reason for reinstating this request.'),
             FileAttachment::make(),
         ]);
 
         $this->action(function (Request $request, array $data) {
-            if ($request->class !== RequestClass::TICKET || $request->action->status === ActionStatus::SUSPENDED) {
+            if ($request->class !== RequestClass::TICKET || $request->action->status === static::$requestAction) {
                 return;
             }
 
@@ -64,7 +64,7 @@ class SuspendRequestAction extends Action
                 $this->beginDatabaseTransaction();
 
                 $action = $request->actions()->create([
-                    'status' => ActionStatus::SUSPENDED,
+                    'status' => static::$requestAction,
                     'user_id' => Auth::id(),
                     'remarks' => $data['remarks'],
                 ]);
@@ -89,11 +89,11 @@ class SuspendRequestAction extends Action
         });
 
         $this->visible(function (Request $request) {
-            if ($request->action->status->finalized() || $request->action->status === ActionStatus::SUSPENDED) {
+            if ($request->action->status->finalized()) {
                 return false;
             }
 
-            return in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::ASSIGNED, ActionStatus::COMPLIED]) && match ($request->class) {
+            return in_array($request->action->status, [ActionStatus::SUSPENDED]) && match ($request->class) {
                 RequestClass::TICKET => $request->assignees->contains(Auth::user()) || Auth::user()->admin,
                 default => false,
             };

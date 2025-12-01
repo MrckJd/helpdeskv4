@@ -3,8 +3,7 @@
 namespace App\Filament\Clusters\Outbound\Resources;
 
 use App\Enums\RequestClass;
-use App\Filament\Actions\Tables\ShowRequestAction;
-use App\Filament\Actions\Tables\ViewRequestHistoryAction;
+use App\Filament\Actions\Tables\ViewRequestAction;
 use App\Filament\Clusters\Outbound;
 use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\ListInquiries;
 use App\Filament\Clusters\Outbound\Resources\RequestResource\Pages\NewInquiry;
@@ -35,8 +34,7 @@ class InquiryResource extends RequestResource
     public static function tableActions(): array
     {
         return [
-            ShowRequestAction::make(),
-            ViewRequestHistoryAction::make(),
+            ViewRequestAction::make(),
         ];
     }
 }

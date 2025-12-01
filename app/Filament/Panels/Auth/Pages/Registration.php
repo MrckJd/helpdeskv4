@@ -3,6 +3,7 @@
 namespace App\Filament\Panels\Auth\Pages;
 
 use App\Enums\UserRole;
+use App\Filament\Concerns\FormatsName;
 use App\Models\Organization;
 use App\Models\User;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
@@ -28,6 +29,8 @@ use Illuminate\Support\HtmlString;
 
 class Registration extends Register
 {
+    use FormatsName;
+
     protected ?string $maxWidth = 'xl';
 
     protected static string $layout = 'filament-panels::components.layout.base';
@@ -107,7 +110,8 @@ class Registration extends Register
                             $this->getNameFormComponent()
                                 ->prefixIcon('heroicon-o-identification')
                                 ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
-                                ->extraAlpineAttributes(['@keyup.enter' => $next]),
+                                ->extraAlpineAttributes(['@keyup.enter' => $next])
+                                ->dehydrateStateUsing(fn ($state) => $this->formatName($state)),
                             $this->getNumberFormComponent()
                                 ->extraAttributes(['onkeydown' => "return event.key != 'Enter';"])
                                 ->extraAlpineAttributes(['@keyup.enter' => $next]),

@@ -9,10 +9,10 @@
     <section wire:poll class="space-y-3">
         <div class="pl-[0.75rem] space-y-3">
             <ol class="relative border-gray-200 border-s dark:border-gray-700">
-                @if(!$chat && $progress && in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::RESPONDED]))
+                @if(!$chat && $progress && in_array($request->action->status, [ActionStatus::STARTED, ActionStatus::REPLIED]))
                     <li class="mb-4 ms-6">
                         <span
-                            class='absolute flex items-center justify-center w-6 h-6 bg-white rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-gray-900'
+                                class='absolute flex items-center justify-center w-6 h-6 bg-white rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-gray-900'
                             @style(['color:'.ColorToHex::convert('gray')])
                         >
                             <x-filament::icon class="w-6 h-6" :icon="ActionStatus::IN_PROGRESS->getIcon()"/>
@@ -41,7 +41,7 @@
                 @elseif(!$chat && $progress && in_array($request->action->status, [ActionStatus::SUSPENDED]))
                     <li class="mb-4 ms-6">
                         <span
-                            class='absolute flex items-center justify-center w-6 h-6 bg-white rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-gray-900'
+                                class='absolute flex items-center justify-center w-6 h-6 bg-white rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-gray-900'
                             @style(['color:'.ColorToHex::convert(ActionStatus::ON_HOLD->getColor())])
                         >
                             <x-filament::icon class="w-6 h-6" :icon="ActionStatus::ON_HOLD->getIcon()"/>
@@ -62,7 +62,7 @@
 
                 @foreach (
                     $request->actions
-                        ->when($chat, fn ($actions) => $actions->filter(fn ($action) => $action->status === ActionStatus::RESPONDED))
+                        ->when($chat, fn ($actions) => $actions->filter(fn ($action) => $action->status === ActionStatus::REPLIED))
                         ->when($descending, fn ($actions) => $actions->sortByDesc('created_at'), fn ($actions) => $actions->sortBy('created_at'))
                     as $action
                 )
