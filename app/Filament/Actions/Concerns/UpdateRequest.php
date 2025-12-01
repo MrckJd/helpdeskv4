@@ -5,6 +5,7 @@ namespace App\Filament\Actions\Concerns;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Models\Request;
+use Exception;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\Enums\Alignment;
@@ -32,6 +33,8 @@ trait UpdateRequest
         $this->modalWidth(MaxWidth::ExtraLarge);
 
         $this->successNotificationTitle('Request updated');
+
+        $this->failureNotificationTitle('Failed to update request');
 
         $this->fillForm(fn (Request $request): array => [
             'subject' => $request->subject,
@@ -61,20 +64,38 @@ trait UpdateRequest
         ]);
 
         $this->action(function (Request $request, array $data): void {
-            $request->update($data);
+            if ($request->body === $data['body'] && $request->subject === $data['subject']) {
+                return;
+            }
 
-            $request->actions()->create([
-                'user_id' => Auth::id(),
-                'status' => ActionStatus::UPDATED,
-            ]);
+            try {
+                $this->beginDatabaseTransaction();
 
-            $this->success();
+                $old = $request->only(['subject', 'body']);
+
+                $request->update($data);
+
+                $request->actions()->create([
+                    'user_id' => Auth::id(),
+                    'status' => ActionStatus::UPDATED,
+                    'remarks' => "#### From: \n\n#### Subject: \n".$old['subject']."\n\n #### Body: \n".$old['body'],
+                ]);
+
+                $this->commitDatabaseTransaction();
+
+                $this->success();
+            } catch (Exception) {
+                $this->rollbackDatabaseTransaction();
+
+                $this->failure();
+            }
         });
 
         $this->hidden(fn (Request $request): bool => $request->trashed());
 
         $this->visible(fn (Request $request): bool => is_null($request->action) ?: in_array($request->action?->status, [
             ActionStatus::RECALLED,
+            ActionStatus::SUSPENDED,
             ActionStatus::RESTORED,
         ]));
     }

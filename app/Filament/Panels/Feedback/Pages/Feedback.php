@@ -404,7 +404,6 @@ class Feedback extends SimplePage implements HasForms
                                 ->columnSpanFull(),
                         ])
                     ])
-                    ->startOnStep(3)
                     ->submitAction(new HtmlString(Blade::render(<<<BLADE
                         <x-filament::button type="submit" size="sm">
                             Submit Feedback

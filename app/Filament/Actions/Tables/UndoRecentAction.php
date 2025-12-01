@@ -15,6 +15,7 @@ class UndoRecentAction extends Action
         ActionStatus::QUEUED,
         ActionStatus::STARTED,
         ActionStatus::SUSPENDED,
+        ActionStatus::REINSTATED,
         ActionStatus::COMPLETED,
         ActionStatus::CLOSED,
     ];

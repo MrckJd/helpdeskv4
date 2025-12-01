@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Panels\Auth\Pages\Profile;
 use App\Http\Middleware\Active;
 use App\Http\Middleware\Approve;
 use App\Http\Middleware\Authenticate;
@@ -14,7 +15,6 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Support\Enums\MaxWidth;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -31,6 +31,7 @@ class ModeratorPanelProvider extends PanelProvider
             ->id('moderator')
             ->path('moderator')
             ->homeUrl('/')
+            ->profile(Profile::class)
             ->brandLogo(fn () => view('banner'))
             ->font('Urbanist')
             ->colors([...Color::all(), 'gray' => Color::Neutral])
@@ -61,7 +62,7 @@ class ModeratorPanelProvider extends PanelProvider
                 Initialize::class,
             ])
             ->globalSearch(false)
-            ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
+            ->maxContentWidth('max-w-[1920px]')
             ->databaseTransactions()
             ->databaseNotifications()
             ->topNavigation()

@@ -70,7 +70,12 @@ class StartRequestAction extends Action
                 return false;
             }
 
-            return in_array($request->action->status, [ActionStatus::ASSIGNED, ActionStatus::COMPLIED, ActionStatus::REOPENED]) && match ($request->class) {
+            return in_array($request->action->status, [
+                ActionStatus::ASSIGNED,
+                ActionStatus::REINSTATED,
+                ActionStatus::COMPLIED,
+                ActionStatus::REOPENED,
+            ]) && match ($request->class) {
                 RequestClass::TICKET => $request->assignees->contains(Auth::user()),
                 default => false,
             };

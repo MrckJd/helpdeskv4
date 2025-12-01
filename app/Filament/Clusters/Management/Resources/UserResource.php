@@ -7,6 +7,7 @@ use App\Filament\Actions\Tables\ApproveAccountAction;
 use App\Filament\Actions\Tables\DeactivateAccessAction;
 use App\Filament\Clusters\Management;
 use App\Filament\Clusters\Management\Resources\UserResource\Pages;
+use App\Filament\Concerns\FormatsName;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Filters\RoleFilter;
 use App\Models\User;
@@ -23,6 +24,8 @@ use Illuminate\Support\Facades\Auth;
 
 class UserResource extends Resource
 {
+    use FormatsName;
+
     protected static ?int $navigationSort = -3;
 
     protected static ?string $model = User::class;
@@ -53,7 +56,8 @@ class UserResource extends Resource
                     ->unique(ignoreRecord: true)
                     ->markAsRequired()
                     ->rule('required')
-                    ->prefixIcon('heroicon-o-user-circle'),
+                    ->prefixIcon('heroicon-o-user-circle')
+                    ->dehydrateStateUsing(fn ($state) => static::nameFormatter($state)),
                 Forms\Components\TextInput::make('designation')
                     ->prefixIcon('heroicon-o-briefcase'),
                 Forms\Components\Select::make('organization_id')

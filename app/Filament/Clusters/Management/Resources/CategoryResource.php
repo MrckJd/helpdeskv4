@@ -6,7 +6,6 @@ use App\Enums\Feedback;
 use App\Filament\Clusters\Management;
 use App\Filament\Clusters\Management\Resources\CategoryResource\Pages;
 use App\Filament\Filters\OrganizationFilter;
-use App\Filament\Helpers\ColorToHex;
 use App\Models\Category;
 use Filament\Facades\Filament;
 use Filament\Forms;

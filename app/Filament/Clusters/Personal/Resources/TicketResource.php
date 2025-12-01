@@ -10,11 +10,9 @@ use App\Filament\Actions\Tables\RecallRequestAction;
 use App\Filament\Actions\Tables\ReopenRequestAction;
 use App\Filament\Actions\Tables\ResolveRequestAction;
 use App\Filament\Actions\Tables\ResubmitRequestAction;
-use App\Filament\Actions\Tables\ShowRequestAction;
-use App\Filament\Actions\Tables\TakeFeedbackAction;
 use App\Filament\Actions\Tables\UndoRecentAction;
 use App\Filament\Actions\Tables\UpdateRequestAction;
-use App\Filament\Actions\Tables\ViewRequestHistoryAction;
+use App\Filament\Actions\Tables\ViewRequestAction;
 use App\Filament\Clusters\Personal;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\ListTickets;
 use App\Filament\Clusters\Personal\Resources\RequestResource\Pages\NewTicket;
@@ -51,10 +49,8 @@ class TicketResource extends RequestResource
             ComplyRequestAction::make(),
             ResubmitRequestAction::make(),
             ResolveRequestAction::make(),
-            ShowRequestAction::make(),
-            ViewRequestHistoryAction::make(),
+            ViewRequestAction::make(),
             ActionGroup::make([
-                TakeFeedbackAction::make(),
                 UndoRecentAction::make(),
                 ReopenRequestAction::make(),
                 UpdateRequestAction::make(),

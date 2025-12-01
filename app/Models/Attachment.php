@@ -13,11 +13,6 @@ class Attachment extends Model
 {
     use HasUlids;
 
-    public static $purgable = [
-        Action::class => 90,
-        Request::class => 90,
-    ];
-
     protected $fillable = [
         'files',
         'paths',
@@ -29,6 +24,14 @@ class Attachment extends Model
         'files' => 'collection',
         'paths' => 'collection',
     ];
+
+    public static function purgable(): array
+    {
+        return [
+            Request::class => config('app.attachments.auto_purge.requests'),
+            Action::class => config('app.attachments.auto_purge.actions'),
+        ];
+    }
 
     public static function booted(): void
     {

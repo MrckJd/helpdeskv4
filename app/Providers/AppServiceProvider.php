@@ -48,14 +48,17 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        Model::automaticallyEagerLoadRelationships();
+
         $this->configureFilament();
+
     }
 
     protected function configureFilament(): void
     {
         FilamentView::registerRenderHook(PanelsRenderHook::HEAD_START, fn () => Blade::render('@vite(\'resources/css/app.css\')'));
 
-        FilamentView::registerRenderHook(PanelsRenderHook::TOPBAR_START, fn () => Blade::render('<div class="flex items-center w-full h-16 px-4 mx-auto md:px-6 lg:px-8 gap-x-4 max-w-screen-2xl 2xl:px-8">'));
+        FilamentView::registerRenderHook(PanelsRenderHook::TOPBAR_START, fn () => Blade::render('<div class="flex items-center w-full h-16 px-4 mx-auto md:px-6 lg:px-8 gap-x-4 max-w-[1920px] 2xl:px-8">'));
 
         FilamentView::registerRenderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render('</div>'));
 

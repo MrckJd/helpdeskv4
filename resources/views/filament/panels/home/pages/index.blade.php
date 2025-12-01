@@ -41,7 +41,7 @@
         </nav>
     </header>
 
-    <div id="home" class="transition-all duration-500 -translate-y-10 opacity-0">
+    <div id="home" class="transition-all duration-500">
         <main class="overflow-hidden">
             <section class="relative">
                 <div class="relative pt-24 lg:pt-28">
@@ -57,17 +57,26 @@
                                 Try our new helpdesk system that helps you manage your organization's support requests with ease.
                             </p>
                             <div class="flex flex-col items-center justify-center gap-4 mt-8">
-                                <div class="">
-                                    <x-filament::button tag="a" outlined icon="gmdi-rocket-launch-o" size="xl" href="{{ route('filament.auth.auth.register') }}">
-                                        Get started
-                                    </x-filament::button>
-                                </div>
+                                <x-filament::button tag="a" icon="gmdi-rocket-launch-o" size="xl" href="{{ route('filament.auth.auth.register') }}">
+                                    Get started
+                                </x-filament::button>
+                            </div>
+                        </div>
+                        <div class="text-center sm:mx-auto sm:w-10/12 lg:mr-auto lg:mt-0 lg:w-4/5">
+                            <div class="hidden">
+                                {{ $this->result }}
+                            </div>
 
-                                <button class="hidden btn variant-ghost sz-lg">
-                                    <span class="text-sm">Learn more</span>
-                                    <svg class="-mr-1" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48">
-                                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="m19 12l12 12l-12 12"/></svg>
-                                </button>
+                            <p class="hidden max-w-2xl mx-auto mt-12 text-lg text-gray-700 text-wrap sm:block dark:text-gray-200">
+                                Or search existing tickets:
+                            </p>
+                            <p class="max-w-2xl mx-auto mt-8 text-gray-700 text-wrap sm:hidden dark:text-gray-200">
+                                Or search existing tickets:
+                            </p>
+                            <div class="flex justify-center gap-4 mt-2">
+                                <x-filament-panels::form id="form" wire:submit='search' class="w-full max-w-lg" >
+                                    {{ $this->form }}
+                                </x-filament-panels::form>
                             </div>
                         </div>
                     </div>
@@ -356,6 +365,23 @@
                                 <img alt="arnel" src="{{ asset('assets/developers/arnel.jpg') }}" class="rounded-full" loading="lazy" width="120" height="120">
                             </a>
                         </div>
+
+                        <div class="mt-16 text-center text-sm text-gray-600 dark:text-gray-400">
+                            This project wouldn’t be the same without the support of our interns: <br>
+
+                            <span class="font-bold">
+                                <a href="https://github.com/llAlcatrazll" target="_blank" class="hover:underline text-gray-700 dark:text-gray-300">
+                                    Alexis Magaway
+                                </a> &amp;
+                                <a href="https://github.com/MrckJd" target="_blank" class="hover:underline text-gray-700 dark:text-gray-300">
+                                    Marck Jude Dura
+                                </a>
+                            </span>
+
+                            <p class="mt-2 text-xs text-gray-500 italic">
+                                *The app's foundation was built on their initial prototype work.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -415,41 +441,10 @@
             </section>
         </main>
     </div>
+
+    <x-filament-actions::modals />
 </div>
 
-@push('scripts')
-<script>
-    document.addEventListener('livewire:navigated', () => {
-        const currentPath = window.location.pathname;
-
-        if (currentPath === "/") {
-            if (!document.getElementById("tailus-css")) {
-                let cssLink = document.createElement("link");
-                cssLink.id = "tailus-css";
-                cssLink.rel = "stylesheet";
-                cssLink.href = "{{ asset('css/tailus.css') }}";
-                document.head.appendChild(cssLink);
-            }
-
-            if (!document.getElementById("tailus-js")) {
-                let jsScript = document.createElement("script");
-                jsScript.id = "tailus-js";
-                jsScript.type = "module";
-                jsScript.src = "{{ asset('js/tailus.js') }}";
-                document.body.appendChild(jsScript);
-            }
-
-            home = document.getElementById('home');
-
-            home.classList.remove('opacity-0');
-            home.classList.remove('-translate-y-10');
-        } else {
-            let cssLink = document.getElementById("tailus-css");
-            if (cssLink) cssLink.remove();
-
-            let jsScript = document.getElementById("tailus-js");
-            if (jsScript) jsScript.remove();
-        }
-    });
-</script>
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/tailus.css') }}">
 @endpush

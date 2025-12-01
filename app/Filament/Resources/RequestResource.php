@@ -2,17 +2,22 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\ActionResolution;
 use App\Enums\ActionStatus;
 use App\Enums\RequestClass;
 use App\Filament\Clusters\Requests;
+use App\Filament\Filters\AssigneeFilter;
 use App\Filament\Filters\OrganizationFilter;
 use App\Filament\Filters\TagFilter;
+use App\Models\Action;
+use App\Models\Category;
 use App\Models\Request;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -36,13 +41,48 @@ abstract class RequestResource extends Resource
         $panel = Filament::getCurrentPanel()->getId();
 
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'organization', 'action', 'actions', 'tags', 'category', 'subcategory']))
             ->columns([
                 TextColumn::make('action.status')
                     ->searchable(['code'])
                     ->label('Status')
                     ->badge()
-                    ->description(fn (Request $request) => "#{$request->code}")
+                    ->description(function (Request $request) {
+                        $action = match($request->class) {
+                            RequestClass::SUGGESTION => match ($request->action->status) {
+                                ActionStatus::CLOSED => match ($request->action->resolution) {
+                                    default => $request->action,
+                                },
+                                default => null,
+                            },
+                            default => match ($request->action->status) {
+                                ActionStatus::COMPLETED,
+                                ActionStatus::SUSPENDED,
+                                ActionStatus::REOPENED,
+                                ActionStatus::REINSTATED => $request->action,
+                                ActionStatus::CLOSED => match ($request->action->resolution) {
+                                    ActionResolution::RESOLVED => $request->completion,
+                                    default => $request->action,
+                                },
+                                default => null,
+                            },
+                        };
+
+                        $color = $action?->status === ActionStatus::CLOSED ? $action->resolution->getColor() : $action?->status->getColor();
+
+                        $latest = $action ?  $action->created_at->format('jS M H:i') : null;
+
+                        $style = $action ? "--c-400:var(--{$color}-400);--c-600:var(--{$color}-600);" : null;
+
+                        $html = <<<HTML
+                            <div class="flex flex-col">
+                                <span class="text-xs text-custom-600 dark:text-custom-400" style="{$style}"> $latest </span>
+
+                                <span class="font-mono text-sm"> #{$request->code} </span>
+                            </div>
+                        HTML;
+
+                        return str($html)->toHtmlString();
+                    })
                     ->state(function (Request $request) {
                         return match ($request->action?->status) {
                             ActionStatus::CLOSED => $request->action?->resolution,
@@ -53,14 +93,29 @@ abstract class RequestResource extends Resource
                         };
                     }),
                 TextColumn::make('subject')
-                    ->sortable()
+                    ->label('Request')
                     ->searchable()
                     ->limit(24)
                     ->wrap()
-                    ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null),
+                    ->tooltip(fn ($column) => strlen($column->getState()) > $column->getCharacterLimit() ? $column->getState() : null)
+                    ->description(function (Request $request) {
+                        $submission = $request->submission
+                            ? $request->submission->created_at->format('jS M H:i')
+                            : null;
+
+                        $html = <<<HTML
+                            <span class="text-xs text-gray-600 dark:text-gray-400">
+                                {$submission}
+                            </span>
+                        HTML;
+
+                        return str($html)->toHtmlString();
+                    }, 'above'),
                 TextColumn::make('user.name')
+                    ->searchable(['name', 'email'])
                     ->description(fn (Request $request) => $request->from?->code)
-                    ->hidden(static::$inbound === null),
+                    ->hidden(static::$inbound === null)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('organization.code')
                     ->sortable()
                     ->searchable()
@@ -69,23 +124,60 @@ abstract class RequestResource extends Resource
                     ->tooltip(fn (Request $request) => $request->organization->name)
                     ->visible(in_array($panel, ['root']) || static::$inbound === null),
                 TextColumn::make('category.name')
-                    ->description(fn (Request $request) => $request->subcategory->name),
+                    ->description(fn (Request $request, $column) => str($request->subcategory->name)->limit($column->getCharacterLimit()))
+                    ->tooltip(fn (Request $request, $column) => max(strlen($column->getState()), strlen($request->subcategory->name)) > $column->getCharacterLimit()
+                        ? "{$column->getState()} — {$request->subcategory->name}"
+                        : null
+                    )
+                    ->limit(24),
+                TextColumn::make('assignees.name')
+                    ->searchable(['name', 'email'])
+                    ->bulleted()
+                    ->limitList(2),
                 TextColumn::make('tags.name')
                     ->badge()
                     ->wrap()
                     ->alignEnd()
                     ->toggleable()
                     ->color(fn (Request $request, string $state) => $request->tags->first(fn ($tag) => $tag->name === $state)?->color ?? 'gray'),
-                TextColumn::make('created_at')
-                    ->since()
-                    ->dateTimeTooltip()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters(static::tableFilters())
             ->actions(static::tableActions())
             ->bulkActions(static::tableBulkActions())
-            ->recordAction(null);
+            ->paginationPageOptions([5, 10, 15, 20, 25])
+            ->defaultPaginationPageOption(10)
+            ->defaultSort(
+                fn (Builder $query) => $query->orderBy(
+                    Action::query()
+                        ->select('id')
+                        ->whereColumn('actions.request_id', 'requests.id')
+                        ->where('status', ActionStatus::SUBMITTED)
+                        ->latest()
+                        ->limit(1),
+                    'desc'
+                ),
+            )
+            ->defaultGroup(
+                Group::make('date')
+                    ->getKeyFromRecordUsing(
+                        fn (Request $record): string => $record->created_at->format('Y-m-0')
+                    )
+                    ->getTitleFromRecordUsing(
+                        fn (Request $record): string => $record->created_at->format('F Y')
+                    )
+                    ->orderQueryUsing(
+                        fn (Builder $query) => $query->orderBy(
+                            Action::query()
+                                ->select('id')
+                                ->whereColumn('actions.request_id', 'requests.id')
+                                ->where('status', ActionStatus::SUBMITTED)
+                                ->latest()
+                                ->limit(1),
+                            'desc'
+                        )
+                    )
+                    ->titlePrefixedWithLabel(false),
+            );
     }
 
     public static function getNavigationBadge(): ?string
@@ -140,9 +232,32 @@ abstract class RequestResource extends Resource
                     ->withUnaffiliated(false),
                 TrashedFilter::make(),
             ],
-            default => [
-                TagFilter::make(),
-            ],
+            default => match (static::$inbound) {
+                true => [
+                    AssigneeFilter::make(),
+                    SelectFilter::make('categories')
+                        ->relationship(
+                            'subcategory',
+                            'name',
+                            fn (Builder $query) => $query
+                                ->with('category')
+                                ->whereRelation('category', 'categories.organization_id', Auth::user()->organization_id)
+                                ->orderBy(
+                                    Category::select('name')
+                                        ->whereColumn('categories.id', 'subcategories.category_id'),
+                                ),
+                        )
+                        ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->category->name} — {$record->name}")
+                        ->searchable()
+                        ->preload()
+                        ->multiple()
+                        ->placeholder('Select categories'),
+                    TagFilter::make(),
+                ],
+                default => [
+                    TagFilter::make(),
+                ],
+            },
         };
     }
 

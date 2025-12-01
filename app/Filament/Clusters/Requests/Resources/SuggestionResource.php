@@ -13,9 +13,8 @@ use App\Filament\Actions\Tables\RecategorizeRequestAction;
 use App\Filament\Actions\Tables\ReclassifyRequestAction;
 use App\Filament\Actions\Tables\RejectRequestAction;
 use App\Filament\Actions\Tables\RestoreRequestAction;
-use App\Filament\Actions\Tables\ShowRequestAction;
 use App\Filament\Actions\Tables\TagRequestAction;
-use App\Filament\Actions\Tables\ViewRequestHistoryAction;
+use App\Filament\Actions\Tables\ViewRequestAction;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\ListSuggestions;
 use App\Filament\Clusters\Requests\Resources\RequestResource\Pages\NewSuggestion;
 use App\Filament\Resources\RequestResource;
@@ -45,9 +44,7 @@ class SuggestionResource extends RequestResource
     {
         return match (Auth::user()->role) {
             UserRole::ROOT => [
-                ShowRequestAction::make()
-                    ->hidden(false),
-                ViewRequestHistoryAction::make()
+                ViewRequestAction::make()
                     ->hidden(false),
                 ActionGroup::make([
                     CompileRequestAction::make(),
@@ -62,8 +59,7 @@ class SuggestionResource extends RequestResource
             UserRole::ADMIN, UserRole::MODERATOR => [
                 AcknowledgeRequestAction::make(),
                 AssignRequestAction::make(),
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
+                ViewRequestAction::make(),
                 ActionGroup::make([
                     TagRequestAction::make(),
                     CompileRequestAction::make(),
@@ -74,8 +70,7 @@ class SuggestionResource extends RequestResource
             ],
             UserRole::AGENT => [
                 AcknowledgeRequestAction::make(),
-                ShowRequestAction::make(),
-                ViewRequestHistoryAction::make(),
+                ViewRequestAction::make(),
                 ActionGroup::make([
                     TagRequestAction::make(),
                     RejectRequestAction::make(),

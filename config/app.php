@@ -133,7 +133,23 @@ return [
     */
 
     'requests' => [
-        'auto_resolve' => env('REQUESTS_AUTO_RESOLVE', 168),
+        'auto_resolve' => env('REQUESTS_AUTO_RESOLVE', 168), // hours
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attachments Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This configuration options determine the default settings for requests.
+    |
+    */
+
+    'attachments' => [
+        'auto_purge' => [
+            'requests' => env('ATTACHMENTS_REQUESTS_AUTO_PURGE', 7), // days
+            'actions' => env('ATTACHMENTS_ACTIONS_AUTO_PURGE', 7),   // days
+        ],
     ],
 
 ];

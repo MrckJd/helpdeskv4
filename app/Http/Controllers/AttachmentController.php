@@ -44,6 +44,14 @@ class AttachmentController extends Controller implements HasMiddleware
 
         abort_unless($allowed, 403);
 
-        return Storage::download($attachment->paths->search($name), $name);
+        $path = $attachment->paths->search($name);
+        $mimeType = Storage::mimeType($path);
+
+        // Serve previewable files inline, others as downloads
+        if (previewable_mime_type($mimeType)) {
+            return Storage::response($path, $name);
+        }
+
+        return Storage::download($path, $name);
     }
 }

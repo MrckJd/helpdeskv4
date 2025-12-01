@@ -29,7 +29,7 @@ class PurgeAttachmentFiles implements ShouldQueue
     {
         $execute = function () {
             $purgable = Attachment::where(function (Builder $query) {
-                foreach (Attachment::$purgable as $model => $duration) {
+                foreach (Attachment::purgable() as $model => $duration) {
                     $query->orWhere(function ($query) use ($model, $duration) {
                         $query->where('attachable_type', $model);
 
@@ -40,8 +40,6 @@ class PurgeAttachmentFiles implements ShouldQueue
 
             $purgable->lazyById()->each->purge();
         };
-
-        
 
         $execute();
     }

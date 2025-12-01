@@ -6,6 +6,6 @@
     </div>
 
     <div @class(["mt-4" => $request->attachment?->files->isNotEmpty()])>
-        @includeWhen($request->attachment?->files->isNotEmpty(), 'filament.requests.attachment', ['attachment' => $request->attachment])
+        @includeWhen($request->attachment?->files->isNotEmpty(), 'filament.attachments.show', ['attachment' => $request->attachment])
     </div>
 @endif

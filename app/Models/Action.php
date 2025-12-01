@@ -22,6 +22,7 @@ class Action extends Model
         'remarks',
         'status',
         'resolution',
+        'system',
     ];
 
     protected $casts = [
