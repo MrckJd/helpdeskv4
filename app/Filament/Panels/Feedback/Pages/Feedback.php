@@ -3,6 +3,8 @@
 namespace App\Filament\Panels\Feedback\Pages;
 
 use App\Enums\Feedback as EnumsFeedback;
+use App\Enums\SqdOption;
+use App\Enums\SqdQuestion;
 use App\Models\Category;
 use App\Models\Feedback as ModelsFeedback;
 use App\Models\Organization;
@@ -270,118 +272,22 @@ class Feedback extends SimplePage implements HasForms
                                 ]),
                             Section::make('Service Quality Dimensions')
                                 ->description('INSTRUCTIONS:  For SQD 0-8, please Choose on the column that best corresponds to your answer.')
-                                ->schema([
-                                    View::make('sqdoptions')
-                                        ->view('filament.panels.feedback..components.sqdlegend'),
-                                    Radio::make('SQD0')
-                                        ->label('SQD0. I am satisfied with the service that I availed.')
-                                        ->options([
-                                            '1' => '1',
-                                            '2' => '2',
-                                            '3' => '3',
-                                            '4' => '4',
-                                            '5' => '5',
-                                        ])
-                                        ->inline()
-                                        ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
-                                        ->required(),
-                                    Radio::make('SQD1')
-                                        ->label('SQD1. I spent a reasonable amount of time for my transaction.')
-                                        ->options([
-                                            '1' => '1',
-                                            '2' => '2',
-                                            '3' => '3',
-                                            '4' => '4',
-                                            '5' => '5',
-                                        ])
-                                        ->inline()
-                                        ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
-                                        ->required(),
-                                    Radio::make('SQD2')
-                                        ->label('SQD2. The office followed the transaction’s requirements and steps based on the information provided.')
-                                        ->options([
-                                            '1' => '1',
-                                            '2' => '2',
-                                            '3' => '3',
-                                            '4' => '4',
-                                            '5' => '5',
-                                        ])
-                                        ->inline()
-                                        ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
-                                        ->required(),
-                                    Radio::make('SQD3')
-                                        ->label('SQD3. The steps (including payment) I needed to do for my transaction were easy and simple.')
-                                        ->options([
-                                            '1' => '1',
-                                            '2' => '2',
-                                            '3' => '3',
-                                            '4' => '4',
-                                            '5' => '5',
-                                        ])
-                                        ->inline()
-                                        ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
-                                        ->required(),
-                                    Radio::make('SQD4')
-                                        ->label('SQD4. I easily found information about my transaction from this office or its website.')
-                                        ->options([
-                                            '1' => '1',
-                                            '2' => '2',
-                                            '3' => '3',
-                                            '4' => '4',
-                                            '5' => '5',
-                                        ])
-                                        ->inline()
-                                        ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
-                                        ->required(),
-                                    Radio::make('SQD5')
-                                        ->label('SQD5. I paid a reasonable amount of fees for my transaction. (if service is free, mark ‘N/A’ column)')
-                                        ->options([
-                                            '1' => '1',
-                                            '2' => '2',
-                                            '3' => '3',
-                                            '4' => '4',
-                                            '5' => '5',
-                                        ])
-                                        ->inline()
-                                        ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
-                                        ->required(),
-                                    Radio::make('SQD6')
-                                        ->label('SQD6. I feel the office was fair to everyone, or “walang palakasan”, during my transaction.')
-                                        ->options([
-                                            '1' => '1',
-                                            '2' => '2',
-                                            '3' => '3',
-                                            '4' => '4',
-                                            '5' => '5',
-                                        ])
-                                        ->inline()
-                                        ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
-                                        ->required(),
-                                    Radio::make('SQD7')
-                                        ->label('SQD7. I was treated courteously by the staff, and (if asked for help) the staff was helpful.')
-                                        ->options([
-                                            '1' => '1',
-                                            '2' => '2',
-                                            '3' => '3',
-                                            '4' => '4',
-                                            '5' => '5',
-                                        ])
-                                        ->inline()
-                                        ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
-                                        ->required(),
-                                    Radio::make('SQD8')
-                                        ->label('SQD8. I got what I needed from this office, or (if denied) denial of request was sufficiently explained to me.')
-                                        ->options([
-                                            '1' => '1',
-                                            '2' => '2',
-                                            '3' => '3',
-                                            '4' => '4',
-                                            '5' => '5',
-                                        ])
-                                        ->inline()
-                                        ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
-                                        ->required(),
-                                ])
+                                ->schema(
+                                    function() : array
+                                    {
+                                        $fields = [];
+                                        foreach(SqdQuestion::cases() as $question){
+                                            $fields[] = Radio::make($question->value)
+                                                ->label($question->getLabel().'. '.$question->getDescription())
+                                                ->options(SqdOption::class)
+                                                ->inline()
+                                                ->inlineLabel(false)
+                                                ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20'])
+                                                ->required();
+                                        }
+                                        return $fields;
+                                    }
+                                )
 
                         ]),
                     Step::make('Suggestions')
@@ -413,5 +319,4 @@ class Feedback extends SimplePage implements HasForms
                     )))
             ]);
     }
-
 }
