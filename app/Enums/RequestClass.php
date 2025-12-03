@@ -12,6 +12,7 @@ enum RequestClass: string implements HasColor, HasDescription, HasIcon, HasLabel
     case INQUIRY = 'inquiry';
     case SUGGESTION = 'suggestion';
     case TICKET = 'ticket';
+    case COMPLAINT = 'complaint';
 
     public function getColor(): string|array|null
     {

@@ -247,7 +247,14 @@ class Feedback extends SimplePage implements HasForms
                                             '3'=> 'I learned of the CC only when I saw the CC of this office.',
                                             '4'=> 'I do not know what a CC is and I did not see the CC of this office. (Answer ‘N/A’ on CC2 and CC3).'
                                         ])
-                                        ->required(),
+                                        ->required()
+                                        ->afterStateUpdated(function( $state, callable $set){
+                                            if($state == '4'){
+                                                $set('CC2', '5');
+                                                $set('CC3', '4');
+                                            }
+                                        } )
+                                        ->live(),
                                     Radio::make('CC2')
                                         ->label('CC2.If aware of CC (answered 1-3 in CC1), would you say that the CC of this office was...')
                                         ->options([
@@ -257,7 +264,8 @@ class Feedback extends SimplePage implements HasForms
                                             '4' => 'Not visible at all',
                                             '5' => 'N/A'
                                         ])
-                                        ->required(),
+                                        ->required()
+                                        ->disabled(fn ( $get) => $get('CC1') == '4'),
                                     Radio::make('CC3')
                                         ->label('CC3. If aware of CC (answered codes 1-3 in CC1), how much did the CC help you in your transaction?')
                                         ->options([
@@ -266,7 +274,8 @@ class Feedback extends SimplePage implements HasForms
                                             '3' => 'Did not help',
                                             '4' => 'N/A'
                                         ])
-                                        ->required(),
+                                        ->required()
+                                        ->disabled(fn ( $get) => $get('CC1') == '4'),
                                 ]),
                             Section::make('Service Quality Dimensions')
                                 ->description('INSTRUCTIONS:  For SQD 0-8, please Choose on the column that best corresponds to your answer.')
