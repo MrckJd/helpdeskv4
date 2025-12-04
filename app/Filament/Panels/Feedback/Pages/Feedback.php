@@ -308,10 +308,12 @@ class Feedback extends SimplePage implements HasForms
                                     '2' => 'Met Expectations',
                                     '3' => 'Fell Short',
                                 ])
+                                ->required()
                                 ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20']),
                             MarkdownEditor::make('strength')
                                 ->label('What did you like the most about our service?')
                                 ->placeholder('Your answer here...')
+                                ->required()
                                 ->columnSpanFull(),
                             MarkdownEditor::make('improvement')
                                 ->label('Comments/Suggestions on how we can further improve our services (optional)')
