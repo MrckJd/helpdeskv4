@@ -7,6 +7,7 @@ use App\Enums\SqdOption;
 use App\Enums\SqdQuestion;
 use App\Models\Category;
 use App\Models\Feedback as ModelsFeedback;
+use App\Models\Municipality;
 use App\Models\Organization;
 use App\Models\Request;
 use Exception;
@@ -95,12 +96,19 @@ class Feedback extends SimplePage implements HasForms
                 'SQD8' => $this->data['SQD8'],
             ];
             $category_id = explode('-',$this->data['category_id']);
+
+            if($this->data['province'] === 'Davao del Sur'){
+                $residence = $this->data['Purok/Sitio'].', '.$this->data['barangay'].', '.$this->data['municipality'].', '.$this->data['province'];
+            }else{
+                $residence = $this->data['residence'];
+            }
+
             $feedback_id = ModelsFeedback::create([
                 'email' => $this->data['email'],
                 'client_type' => $this->data['client_type'] ?? null,
                 'age' => $this->data['age'] ?? null,
                 'gender' => $this->data['gender'] ?? null,
-                'residence' => $this->data['residence'],
+                'residence' => $residence,
                 'service_type' => $this->data['service_type'] ?? null,
                 'category_id' => $category_id[0],
                 'service_type' => $category_id[1],
@@ -215,11 +223,50 @@ class Feedback extends SimplePage implements HasForms
                                 ->numeric()
                                 ->placeholder('Enter your age')
                                 ->rules(['min:1', 'max:120']),
-                            MarkdownEditor::make('residence')
-                                ->label('Place of Residence')
+                            Select::make('province')
+                                ->label('Province')
                                 ->required()
-                                ->placeholder('Enter your place of residence')
-                                ->columnSpanFull(),
+                                ->live()
+                                ->default('Davao del Sur')
+                                ->options([
+                                    'Davao del Sur' => 'Davao del Sur',
+                                    'Outside of Davao del Sur' => 'Outside of Davao del Sur',
+                                ]),
+                            Select::make('municipality')
+                                ->label('City/Municipality')
+                                ->required()
+                                ->disabled(fn($get) => $get('province')==='Outside of Davao del Sur')
+                                ->placeholder('Select your city/municipality')
+                                ->options(function (){
+                                    return Municipality::orderBy('name')->pluck('name','name')->toArray();
+                                }),
+                            Select::make('barangay')
+                                ->label('Barangay')
+                                ->required()
+                                ->disabled(fn($get) => $get('province')==='Outside of Davao del Sur')
+                                ->placeholder('Select your barangay')
+                                ->options(function (callable $get){
+                                    $municipality = $get('municipality');
+                                    if(!$municipality){
+                                        return [];
+                                    }
+                                    $municipalityModel = Municipality::where('name', $municipality)->first();
+                                    if(!$municipalityModel){
+                                        return [];
+                                    }
+                                    return $municipalityModel->barangays()->orderBy('name')->pluck('name','name')->toArray();
+                                }),
+                            TextInput::make('Purok/Sitio')
+                                ->label('Purok/Sitio/Street')
+                                ->placeholder('Enter your Purok/Sitio/Street')
+                                ->required()
+                                ->disabled(fn($get) => $get('province')==='Outside of Davao del Sur'),
+                            TextInput::make('residence')
+                                ->label('Residence')
+                                ->columnSpanFull()
+                                ->placeholder('Enter your residence (e.g., Outside of Davao del Sur or specific address)')
+                                ->required()
+                                ->visible(fn($get) => $get('province')==='Outside of Davao del Sur'),
                         ]),
                     Step::make('Feedback')
                         ->schema([
@@ -308,10 +355,12 @@ class Feedback extends SimplePage implements HasForms
                                     '2' => 'Met Expectations',
                                     '3' => 'Fell Short',
                                 ])
+                                ->required()
                                 ->extraAttributes(['class'=> 'flex-col lg:flex-row lg:!gap-20']),
                             MarkdownEditor::make('strength')
                                 ->label('What did you like the most about our service?')
                                 ->placeholder('Your answer here...')
+                                ->required()
                                 ->columnSpanFull(),
                             MarkdownEditor::make('improvement')
                                 ->label('Comments/Suggestions on how we can further improve our services (optional)')

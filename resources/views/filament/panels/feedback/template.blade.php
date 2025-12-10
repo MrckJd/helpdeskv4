@@ -50,7 +50,7 @@
               <div class="font-bold">External Services</div>
               <ul class="ml-4">
                 @foreach ($record->organization->categories as $category)
-                    @if(in_array(Feedback::EXTERNAL->value, $category->service_type ?? []))
+                    @if($category->service_type === Feedback::EXTERNAL)
                          <li><label><input type="radio" class="radio" {{($record->service_type === Feedback::EXTERNAL && $record->category_id === $category->id) ? 'checked': ''}} disabled>{{$category->name}}</label></li>
                     @endif
                 @endforeach
@@ -61,7 +61,7 @@
               <div class="font-bold">Internal Services</div>
               <ul class="ml-4">
                 @foreach ($record->organization->categories as $category)
-                    @if (in_array(Feedback::INTERNAL->value,$category->service_type ?? []))
+                    @if ($category->service_type === Feedback::INTERNAL)
                          <li><label><input type="radio" class="radio" {{($record->service_type === Feedback::INTERNAL && $record->category_id === $category->id) ? 'checked': ''}} disabled>{{$category->name}}</label></li>
                     @endif
                 @endforeach
