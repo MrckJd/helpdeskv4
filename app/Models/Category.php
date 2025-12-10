@@ -26,7 +26,7 @@ class Category extends Model
 
     protected $casts = [
         'standard_type' => Feedback::class,
-        'service_type' => 'array',
+        'service_type' => Feedback::class,
     ];
 
     public static function booted()

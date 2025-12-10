@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->string('standard_type');
-            $table->string('service_type');
+        Schema::table('feedback', function (Blueprint $table) {
+            $table->string('control_no');
+
         });
     }
 
@@ -22,9 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->dropColumn('standard_type');
-            $table->dropColumn('service_type');
-        });
+        //
     }
 };

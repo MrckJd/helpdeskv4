@@ -29,6 +29,20 @@ class Feedback extends Model
         'service_type',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            if (is_null($model->control_no)) {
+                do{
+                    $generatedCode = fake()->bothify('????####');
+                } while (static::where('control_no', $generatedCode)->exists());
+
+                $model->control_no = $generatedCode;
+            }
+        });
+
+    }
+
     protected function casts(): array
     {
         return [

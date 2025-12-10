@@ -67,7 +67,6 @@ class CategoryResource extends Resource
                 Forms\Components\Select::make('service_type')
                     ->label('Service Type')
                     ->columnSpanFull()
-                    ->multiple()
                     ->allowHtml()
                     ->required()
                     ->options(function () {
@@ -105,13 +104,13 @@ class CategoryResource extends Resource
                     ->description(
                                     function(Category $category) use ($panel) {
                                             $organization_code = '';
-                                            $service_type=collect($category->service_type)->map(function($type){
-                                                $feedbackServiceType = FeedBack::from($type)->getLabel();
-
-                                                return <<<HTML
-                                                            <span class="px-2 rounded-md text-sm border border-amber-600/40 bg-amber-600/10 text-amber-600" >{$feedbackServiceType} Service</span>
+                                            $service_type=
+                                                        <<<HTML
+                                                            <span class="px-2 rounded-md text-sm border border-amber-600/40 bg-amber-600/10 text-amber-600" >{$category->service_type?->getLabel()} Service</span>
                                                         HTML;
-                                            })->join(' ');
+
+
+
                                             if($panel === 'root')
                                                 $organization_code = $category->organization->code;
 
