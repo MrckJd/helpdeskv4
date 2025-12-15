@@ -274,16 +274,18 @@ class Feedback extends SimplePage implements HasForms
                                 ->label('Service Type')
                                 ->required()
                                 ->placeholder('Select the service availed')
-                                ->reactive()
                                 ->native(false)
-                                ->allowHtml()
                                 ->options(function (){
-                                   return collect($this->organization->categories)->flatMap(function($category){
-                                        return collect($category->service_type)->mapWithKeys(function($service_type) use ($category){
-                                            $service_type_enums=EnumsFeedback::from($service_type)->getLabel();
-                                            return [$category->id.'-'.$service_type => "<div class='flex flex-col'><span>{$category->name}</span><span class='italic opacity-50'>{$service_type_enums} Service</span></div>"];
-                                        });
-                                   });
+                                    $options = [];
+                                    $categories = Category::with('subcategories')->orderBy('name')->get();
+                                    foreach($categories as $category){
+                                        $subOptions = [];
+                                        foreach($category->subcategories as $subcategory){
+                                            $subOptions[$subcategory->name] = $subcategory->name;
+                                        }
+                                        $options["<optgroup label='{$category->name}'>"] = $subOptions;
+                                    }
+                                    return $options;
                                 }),
                             Section::make('Citizen Charter')
                                 ->description('INSTRUCTIONS: Choose your answer to the Citizen’s Charter (CC) questions. The Citizen’s Charter is an official document that reflects the services of a government agency/office including its requirements, fees, and processing times among others.')

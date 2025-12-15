@@ -3,6 +3,7 @@
 namespace App\Filament\Actions;
 
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Support\Enums\Alignment;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -20,13 +21,15 @@ class ViewQrCodeAction extends Action
 
         $this->icon('gmdi-qr-code-o');
 
+        $this->hidden(fn () => Filament::getCurrentPanel()->getId() !== 'admin');
+
         $this->modalIcon('gmdi-qr-code-o');
 
         $this->modalWidth(\Filament\Support\Enums\MaxWidth::Small);
 
         $this->modalDescription('You can download this QR code and share it to access the feedback form for your office.');
 
-        $this->modalHeading(request()->user()->organization->code . ' QR Code');
+        $this->modalHeading(request()->user()->organization->code ?? '' . ' QR Code');
 
         $this->modalSubmitActionLabel('Download');
 
@@ -35,6 +38,7 @@ class ViewQrCodeAction extends Action
         $this->closeModalByClickingAway(false);
 
         $this->modalFooterActionsAlignment(Alignment::Center);
+
 
         $this->modalContent(function () {
             return view('filament.panels.admin.clusters.organization.view-qrCode', [

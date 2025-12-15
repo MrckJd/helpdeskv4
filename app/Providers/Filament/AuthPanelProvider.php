@@ -65,8 +65,7 @@ class AuthPanelProvider extends PanelProvider
             ])
             ->maxContentWidth('max-w-[1920px]')
             ->databaseTransactions()
-            ->topNavigation()
-            ->spa();
+            ->topNavigation();
     }
 
     public function boot(): void

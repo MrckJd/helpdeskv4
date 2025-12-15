@@ -66,8 +66,7 @@ class AuditorPanelProvider extends PanelProvider
             ->maxContentWidth(MaxWidth::ScreenTwoExtraLarge)
             ->databaseTransactions()
             ->databaseNotifications()
-            ->topNavigation()
-            ->spa();
+            ->topNavigation();
 
     }
 }
