@@ -66,7 +66,6 @@ class UserPanelProvider extends PanelProvider
             ->maxContentWidth('max-w-[1920px]')
             ->databaseTransactions()
             ->databaseNotifications()
-            ->topNavigation()
-            ->spa();
+            ->topNavigation();
     }
 }

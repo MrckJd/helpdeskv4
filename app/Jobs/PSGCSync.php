@@ -7,22 +7,20 @@ use App\Models\Municipality;
 use App\Services\PSGCApiService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Laravel\Reverb\Loggers\Log;
+use Illuminate\Support\Facades\Log;
 
 class PSGCSync implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct()
-    {
-
-    }
-
     public function handle(): void
     {
+
         $execute = function () {
             try{
                 $municipalities = PSGCApiService::getMunicipalities();
+
+
 
                 if(empty($municipalities)) {
                     return;
@@ -66,7 +64,7 @@ class PSGCSync implements ShouldQueue
                     }
                 }
             }catch (\Exception $e) {
-                Log::error('Error syncing address data: ' . $e->getMessage());
+                dd($e->getMessage());
             }
         };
         $execute();
