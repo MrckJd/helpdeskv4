@@ -73,6 +73,18 @@ services:
       - "if [ \"$APP_ENV\" != \"production\" ]; then\n    exec /mailpit\nelse\n    exit 0\nfi\n"
     networks:
       - helpdesk
+  redis:
+    image: redis:alpine
+    container_name: helpdesk.redis
+    ports:
+      - "6379:6379"
+    networks:
+      - helpdesk
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 networks:
   helpdesk:
     name: helpdesk

@@ -11,6 +11,7 @@
         "codeat3/blade-simple-icons": "^6.11",
         "filament/filament": "^3.3",
         "laravel/framework": "^12.8",
+        "laravel/horizon": "^5.40",
         "laravel/octane": "^2.9",
         "laravel/pulse": "^1.4",
         "laravel/reverb": "^1.5",
