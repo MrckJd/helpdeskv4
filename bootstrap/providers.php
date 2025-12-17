@@ -11,8 +11,7 @@ return [
     App\Providers\Filament\ModeratorPanelProvider::class,
     App\Providers\Filament\RootPanelProvider::class,
     App\Providers\Filament\UserPanelProvider::class,
+    App\Providers\HorizonServiceProvider::class,
     App\Providers\MacroServiceProvider::class,
-
-    // ClamAV
-    \Sunspikes\ClamavValidator\ClamavValidatorServiceProvider::class,
+    Sunspikes\ClamavValidator\ClamavValidatorServiceProvider::class,
 ];
