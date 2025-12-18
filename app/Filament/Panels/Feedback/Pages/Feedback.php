@@ -95,8 +95,6 @@ class Feedback extends SimplePage implements HasForms
                 'SQD7' => $this->data['SQD7'],
                 'SQD8' => $this->data['SQD8'],
             ];
-            $category_id = explode('-',$this->data['category_id']);
-
             if($this->data['province'] === 'Davao del Sur'){
                 $residence = $this->data['Purok/Sitio'].', '.$this->data['barangay'].', '.$this->data['municipality'].', '.$this->data['province'];
             }else{
@@ -109,9 +107,7 @@ class Feedback extends SimplePage implements HasForms
                 'age' => $this->data['age'] ?? null,
                 'gender' => $this->data['gender'] ?? null,
                 'residence' => $residence,
-                'service_type' => $this->data['service_type'] ?? null,
-                'category_id' => $category_id[0],
-                'service_type' => $category_id[1],
+                'category_id' => $this->data['category_id'],
                 'expectation' => $this->data['expectation'] ?? null,
                 'strength' => $this->data['strength'] ?? null,
                 'improvement' => $this->data['improvement'] ?? null,
@@ -144,7 +140,6 @@ class Feedback extends SimplePage implements HasForms
 
             }catch(Exception $e){
                 DB::rollBack();
-
                 Notification::make()
                 ->title('An '.$e->getMessage().' error occurred while submitting your feedback. Please try again.')
                 ->danger()
@@ -276,16 +271,9 @@ class Feedback extends SimplePage implements HasForms
                                 ->placeholder('Select the service availed')
                                 ->native(false)
                                 ->options(function (){
-                                    $options = [];
-                                    $categories = Category::with('subcategories')->orderBy('name')->get();
-                                    foreach($categories as $category){
-                                        $subOptions = [];
-                                        foreach($category->subcategories as $subcategory){
-                                            $subOptions[$subcategory->name] = $subcategory->name;
-                                        }
-                                        $options["<optgroup label='{$category->name}'>"] = $subOptions;
-                                    }
-                                    return $options;
+                                       return Organization::findOrFail($this->organization->id)
+                                        ->categories()
+                                        ->pluck('name','id');
                                 }),
                             Section::make('Citizen Charter')
                                 ->description('INSTRUCTIONS: Choose your answer to the Citizen’s Charter (CC) questions. The Citizen’s Charter is an official document that reflects the services of a government agency/office including its requirements, fees, and processing times among others.')

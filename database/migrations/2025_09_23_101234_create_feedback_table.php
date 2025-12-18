@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('expectation')->nullable();
             $table->string('strength')->nullable();
             $table->string('improvement')->nullable();
-            $table->string('service_type');
             $table->foreignUlid('category_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
             $table->foreignUlid('request_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
             $table->foreignUlid('organization_id')->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();

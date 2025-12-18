@@ -51,7 +51,7 @@ class CategoryResource extends Resource
                     ->label('Name')
                     ->columnSpanFull()
                     ->dehydrateStateUsing(fn (?string $state) => mb_ucfirst($state ?? ''))
-                    ->maxLength(48)
+                    ->maxLength(256)
                     ->rule('required')
                     ->markAsRequired()
                     ->unique(

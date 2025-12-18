@@ -26,7 +26,6 @@ class Feedback extends Model
         'expectation',
         'strength',
         'improvement',
-        'service_type',
     ];
 
     protected static function booted(): void
@@ -47,7 +46,6 @@ class Feedback extends Model
     {
         return [
             'feedbacks' => 'array',
-            'service_type' => EnumsFeedback::class,
         ];
     }
 
