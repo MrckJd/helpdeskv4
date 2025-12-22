@@ -7,7 +7,7 @@
     <div class="w-[8.5in] min-h-[13in] mx-auto">
         <div class="flex justify-between align-baseline">
             <div class="opacity-50">ENGLISH VERSION</div>
-            <div><span>Control No: </span><span class="inline-block min-w-[120px] border-b-[1px] border-black">&nbsp;</span></div>
+            <div><span>Control No:  </span><span class="font-bold inline-block min-w-[100px] border-b-[1px] border-black">{{$record->control_no ?? ''}}</span></div>
         </div>
         <br>
         <div class="grid grid-cols-5 leading-none text-center">
