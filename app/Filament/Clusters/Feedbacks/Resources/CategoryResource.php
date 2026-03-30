@@ -49,8 +49,8 @@ class CategoryResource extends Resource
                 TextColumn::make('not_surveyed_count')
                     ->label('Not Surveyed')
                     ->default(0)
-                    ->formatStateUsing(fn($state, $record) => $record->getTotalTransactionsAttribute() - $record->feedbacks()->count()),
-                TextColumn::make('total_transactions')
+                    ->formatStateUsing(fn($state, $record) => $record->transactions_sum_total_transactions - $record->feedbacks()->count()),
+                TextColumn::make('transactions_sum_total_transactions')
                     ->label('Total Transactions')
                     ->sortable()
                     ->default(0),

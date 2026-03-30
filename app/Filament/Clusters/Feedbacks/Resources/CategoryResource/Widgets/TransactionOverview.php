@@ -70,17 +70,14 @@ class TransactionOverview extends BaseWidget
 
             $userOrganization = Auth::user()->organization_id;
 
-            return Feedback::where('organization_id', $userOrganization)->count() +
-                Transaction::where('organization_id', $userOrganization)->sum('total_transactions') +
-                Request::where('organization_id', $userOrganization)->count();
+            return Transaction::where('organization_id', $userOrganization)->sum('total_transactions');
         }
 
         if(!isset($tableFilters['organization_id']['value'])){
-            return Feedback::count() + Request::count() + Transaction::sum('total_transactions');
+            return Transaction::sum('total_transactions');
         }else{
-            return Feedback::where('organization_id', $tableFilters['organization_id']['value'])->count() +
-                Transaction::where('organization_id', $tableFilters['organization_id']['value'])->sum('total_transactions') +
-                Request::where('organization_id', $tableFilters['organization_id']['value'])->count();
+            return Transaction::where('organization_id', $tableFilters['organization_id']['value'])->sum('total_transactions');
+
         }
 
         return 0;
@@ -106,13 +103,12 @@ class TransactionOverview extends BaseWidget
 
     private function getTotalNotSurveyed(array $tableFilters, string $panelID): int
     {
+
         if ($panelID ===  UserRole::ADMIN->value){
 
             $userOrganization = Auth::user()->organization_id;
 
-            $totalTransactions = Feedback::where('organization_id', $userOrganization)->count() +
-                Transaction::where('organization_id', $userOrganization)->sum('total_transactions') +
-                Request::where('organization_id', $userOrganization)->count();
+            $totalTransactions= Transaction::where('organization_id', $userOrganization)->sum('total_transactions');
 
             $totalSurveyed = Feedback::where('organization_id', $userOrganization)->count();
 
@@ -120,13 +116,12 @@ class TransactionOverview extends BaseWidget
         }
 
         if(!isset($tableFilters['organization_id']['value'])){
-            $totalTransactions = Feedback::count() + Request::count() + Transaction::sum('total_transactions');
+
             $totalSurveyed = Feedback::count();
-            return $totalTransactions - $totalSurveyed;
+
+            return Transaction::sum('total_transactions') - $totalSurveyed;
         }else{
-            $totalTransactions = Feedback::where('organization_id', $tableFilters['organization_id']['value'])->count() +
-                Transaction::where('organization_id', $tableFilters['organization_id']['value'])->sum('total_transactions') +
-                Request::where('organization_id', $tableFilters['organization_id']['value'])->count();
+            $totalTransactions = Transaction::where('organization_id', $tableFilters['organization_id']['value'])->sum('total_transactions');
 
             $totalSurveyed = Feedback::where('organization_id', $tableFilters['organization_id']['value'])->count();
 
