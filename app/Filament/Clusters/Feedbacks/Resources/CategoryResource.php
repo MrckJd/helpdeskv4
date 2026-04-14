@@ -86,10 +86,4 @@ class CategoryResource extends Resource
         ];
     }
 
-    public static function getWidgets(): array
-    {
-        return [
-            CategoryResource\Widgets\TransactionOverview::class,
-        ];
-    }
 }

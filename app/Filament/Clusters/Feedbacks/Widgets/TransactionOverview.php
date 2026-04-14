@@ -1,44 +1,43 @@
 <?php
 
-namespace App\Filament\Clusters\Feedbacks\Resources\CategoryResource\Widgets;
+namespace App\Filament\Clusters\Feedbacks\Widgets;
 
 use App\Enums\UserRole;
-use App\Filament\Clusters\Feedbacks\Resources\CategoryResource\Pages\ListCategories;
 use App\Models\Feedback;
 use App\Models\Request;
 use App\Models\Transaction;
 use Filament\Facades\Filament;
-use Filament\Widgets\Concerns\InteractsWithPageTable;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Auth;
+use Filament\Pages\Concerns\InteractsWithHeaderActions;
+use Livewire\Attributes\Reactive;
 
 class TransactionOverview extends BaseWidget
 {
-    use InteractsWithPageTable;
 
-    protected function getTablePage(): string
-    {
-        return ListCategories::class;
-    }
+    #[Reactive]
+    public ?string $selectedOrganizationId = null;
 
     protected function getStats(): array
     {
         $panelID = Filament::getCurrentPanel()->getId();
-        $tableFilters = $this->tableFilters;
+
+        $selectedOrganizationId = $this->selectedOrganizationId;
+
         return [
-            Stat::make('Total Transaction', $this->getTotalTransactions($tableFilters ?? [], $panelID))
+            Stat::make('Total Transaction', $this->getTotalTransactions($selectedOrganizationId, $panelID))
                 ->description('Total number of transactions recorded.')
                 ->color('primary')
                 ->chart($this->totalTransactionsChart()),
-            Stat::make('Total Surveyed', $this->getTotalSurveyed($tableFilters ?? [], $panelID))
+            Stat::make('Total Surveyed', $this->getTotalSurveyed($selectedOrganizationId, $panelID))
                 ->color('success')
                 ->description('Total number of transactions that have been surveyed.')
                 ->chart($this->totalSurveyedChart()),
-            Stat::make('Total Not Surveyed', $this->getTotalNotSurveyed($tableFilters ?? [], $panelID))
+            Stat::make('Total Not Surveyed', $this->getTotalNotSurveyed($selectedOrganizationId, $panelID))
                 ->description('Total number of transactions that have not been surveyed.')
                 ->color('danger'),
-            Stat::make('Percentage', $this->getPercentage($this->getTotalSurveyed($tableFilters ?? [], $panelID), $this->getTotalTransactions($tableFilters ?? [], $panelID)))
+            Stat::make('Percentage', $this->getPercentage($this->getTotalSurveyed($selectedOrganizationId, $panelID), $this->getTotalTransactions($this->selectedOrganizationId, $panelID)))
                 ->description('Percentage of transactions that have been surveyed.')
                 ->color('zinc'),
         ];
@@ -64,7 +63,7 @@ class TransactionOverview extends BaseWidget
             ->toArray();
     }
 
-    private function getTotalTransactions(array $tableFilters, string $panelID): int
+    private function getTotalTransactions(?string $organizationId, string $panelID): int
     {
         if ($panelID ===  UserRole::ADMIN->value){
 
@@ -73,17 +72,17 @@ class TransactionOverview extends BaseWidget
             return Transaction::where('organization_id', $userOrganization)->sum('total_transactions');
         }
 
-        if(!isset($tableFilters['organization_id']['value'])){
+        if(!$organizationId){
             return Transaction::sum('total_transactions');
         }else{
-            return Transaction::where('organization_id', $tableFilters['organization_id']['value'])->sum('total_transactions');
+            return Transaction::where('organization_id', $organizationId)->sum('total_transactions');
 
         }
 
         return 0;
     }
 
-    private function getTotalSurveyed(array $tableFilters, string $panelID): int
+    private function getTotalSurveyed(?string $organizationId, string $panelID): int
     {
         if ($panelID ===  UserRole::ADMIN->value){
 
@@ -92,16 +91,16 @@ class TransactionOverview extends BaseWidget
             return Feedback::where('organization_id', $userOrganization)->count();
         }
 
-        if(!isset($tableFilters['organization_id']['value'])){
+        if(!$organizationId){
             return Feedback::count();
         }else{
-            return Feedback::where('organization_id', $tableFilters['organization_id']['value'])->count();
+            return Feedback::where('organization_id', $organizationId)->count();
         }
 
         return 0;
     }
 
-    private function getTotalNotSurveyed(array $tableFilters, string $panelID): int
+    private function getTotalNotSurveyed(?string $organizationId, string $panelID): int
     {
 
         if ($panelID ===  UserRole::ADMIN->value){
@@ -115,15 +114,15 @@ class TransactionOverview extends BaseWidget
             return $totalTransactions - $totalSurveyed;
         }
 
-        if(!isset($tableFilters['organization_id']['value'])){
+        if(!$organizationId){
 
             $totalSurveyed = Feedback::count();
 
             return Transaction::sum('total_transactions') - $totalSurveyed;
         }else{
-            $totalTransactions = Transaction::where('organization_id', $tableFilters['organization_id']['value'])->sum('total_transactions');
+            $totalTransactions = Transaction::where('organization_id',$organizationId)->sum('total_transactions');
 
-            $totalSurveyed = Feedback::where('organization_id', $tableFilters['organization_id']['value'])->count();
+            $totalSurveyed = Feedback::where('organization_id',$organizationId)->count();
 
             return $totalTransactions - $totalSurveyed;
         }

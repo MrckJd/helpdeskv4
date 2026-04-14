@@ -22,11 +22,4 @@ class ListCategories extends ListRecords
         ];
     }
 
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            CategoryResource\Widgets\TransactionOverview::class,
-        ];
-    }
-
 }
