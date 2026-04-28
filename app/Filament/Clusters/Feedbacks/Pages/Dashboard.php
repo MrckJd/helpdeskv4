@@ -2,20 +2,30 @@
 
 namespace App\Filament\Clusters\Feedbacks\Pages;
 
+use App\Enums\SqdQuestion;
 use App\Filament\Actions\Header\SelectAction;
 use App\Filament\Clusters\Feedbacks;
+use App\Filament\Clusters\Feedbacks\Widgets\AgeChartWidget;
 use App\Filament\Clusters\Feedbacks\Widgets\CustomerTypeWidget;
 use App\Filament\Clusters\Feedbacks\Widgets\GenderChart;
-use App\Filament\Clusters\Feedbacks\Widgets\TransactionOverview;
+use App\Filament\Clusters\Feedbacks\Widgets\OverviewStatsWidget;
+use App\Models\Response;
+use App\Models\Transaction;
 use Filament\Actions\Action;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
+use Filament\Tables\Columns\Summarizers\Average;
+use Filament\Tables\Columns\Summarizers\Sum;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
 use Livewire\Attributes\Url;
 
-class Dashboard extends Page implements HasForms
+class Dashboard extends Page implements HasForms, HasTable
 {
-    use InteractsWithForms;
+    use InteractsWithForms, InteractsWithTable;
 
     protected static string $view = 'filament.panels.feedback.pages.dashboard';
 
@@ -26,10 +36,86 @@ class Dashboard extends Page implements HasForms
     #[Url(history: true)]
     public ?string $selectedOrganizationId = null;
 
-
     public function mount(): void
     {
         $this->form->fill();
+    }
+
+    public function table(Table $table): Table
+    {
+        $answerColumns = [
+            'ans_5_count' => 'Strongly Agree',
+            'ans_4_count' => 'Agree',
+            'ans_3_count' => 'Neither Agree nor Disagree',
+            'ans_2_count' => 'Disagree',
+            'ans_1_count' => 'Strongly Disagree',
+            'ans_0_count' => 'No Response',
+        ];
+
+        $query = Response::select('question')
+            ->selectRaw('COUNT(*) as total_responses')
+            ->selectRaw('SUM(CASE WHEN answer = 0 THEN 1 ELSE 0 END) as ans_0_count')
+            ->selectRaw('SUM(CASE WHEN answer = 1 THEN 1 ELSE 0 END) as ans_1_count')
+            ->selectRaw('SUM(CASE WHEN answer = 2 THEN 1 ELSE 0 END) as ans_2_count')
+            ->selectRaw('SUM(CASE WHEN answer = 3 THEN 1 ELSE 0 END) as ans_3_count')
+            ->selectRaw('SUM(CASE WHEN answer = 4 THEN 1 ELSE 0 END) as ans_4_count')
+            ->selectRaw('SUM(CASE WHEN answer = 5 THEN 1 ELSE 0 END) as ans_5_count')
+            ->selectRaw('ROUND(
+                            (SUM(CASE WHEN answer IN (4, 5) THEN 1 ELSE 0 END) * 100.0) / (NULLIF(COUNT(*), 0) - SUM(CASE WHEN answer = 0 THEN 1 ELSE 0 END)),
+                        2) AS overall_percentage')
+            ->where('question', 'not like', 'CC%')
+            ->where('question', '!=', 'SQD0')
+            ->groupBy('question')
+            ->orderBy('question');
+
+        return $table
+            ->query($query)
+            ->striped()
+            ->paginated(false)
+            ->columns(
+                array_merge([
+                    TextColumn::make('question')
+                        ->label('Service Quality Dimensions')
+                        ->width('100px')
+                        ->extraHeaderAttributes(['class' => 'whitespace-normal text-center'])
+                        ->formatStateUsing(fn ($state) => SqdQuestion::tryFrom($state)?->getStandardizedName() ?? $state)
+                        ->width('15%')
+                        ->wrapHeader(),
+                ],
+                array_map(fn ($column, $label) => TextColumn::make($column)
+                    ->label($label)
+                    ->extraHeaderAttributes(['class' => 'whitespace-normal text-center'])
+                    ->alignCenter()
+                    ->width('14%')
+                    ->wrapHeader()
+                    ->summarize(Sum::make()->label('')->extraAttributes(['class' => 'font-bold [&_span]:!text-black'])),
+                    array_keys($answerColumns), $answerColumns),
+                [
+                    TextColumn::make('total_responses')
+                        ->label('Total Responses')
+                        ->extraHeaderAttributes(['class' => 'whitespace-normal text-center'])
+                        ->alignCenter()
+                        ->width('15%')
+                        ->summarize(Sum::make()->label('')->extraAttributes(['class' => 'font-bold [&_span]:!text-black'])),
+                    TextColumn::make('overall_percentage')
+                        ->label('Overall')
+                        ->extraHeaderAttributes(['class' => 'whitespace-normal text-center'])
+                        ->alignCenter()
+                        ->formatStateUsing(fn ($state) => $state !== null ? number_format($state, 2) . '%' : 'N/A')
+                        ->width('15%')
+                        ->summarize(Average::make()
+                                        ->label('')
+                                        ->formatStateUsing(fn ($state) => $state !== null ? number_format($state, 2) . '%' : 'N/A')
+                                        ->extraAttributes(['class' => 'font-bold [&_span]:!text-black']))
+                        ->wrapHeader(),
+                ]),
+
+            );
+    }
+
+    public function getTableRecordKey(mixed $record): string
+    {
+        return $record->question;
     }
 
     public function getBreadcrumbs(): array
@@ -53,16 +139,25 @@ class Dashboard extends Page implements HasForms
     public function getHeaderWidgets(): array
     {
         return [
-            TransactionOverview::make([
+            OverviewStatsWidget::make([
                 'selectedOrganizationId' => $this->selectedOrganizationId,
             ]),
-            CustomerTypeWidget::make(),
+            ];
+    }
 
+    public function getFooterWidgets(): array
+    {
+        return [
             GenderChart::make([
                 'selectedOrganizationId' => $this->selectedOrganizationId,
+                ]),
+            CustomerTypeWidget::make([
+                    'selectedOrganizationId' => $this->selectedOrganizationId,
+                    ]),
+            AgeChartWidget::make([
+                    'selectedOrganizationId' => $this->selectedOrganizationId,
             ]),
-
-            ];
+        ];
     }
 
 

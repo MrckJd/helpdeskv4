@@ -2,36 +2,27 @@
 
 namespace App\Filament\Clusters\Feedbacks\Widgets;
 
+use App\Enums\UserRole;
+use App\Filament\Clusters\Feedbacks\Widgets\Concerns\FeedbackScopes;
 use App\Models\Feedback;
+use Livewire\Attributes\Reactive;
 
 class CustomerTypeWidget extends GenderChart
 {
+    use FeedbackScopes;
+
     protected static ?string $heading = 'Customer Type';
 
     protected function getData(): array
     {
-        $query = Feedback::query();
-
-        if ($this->selectedOrganizationId) {
-            $query->where('organization_id', $this->selectedOrganizationId);
-        }
-
-        $data = match($this->filter) {
-            'internal' => $query->whereHas('category', function($q) {
-                $q->where('service_type', 'internal');
-            }),
-            'external' => $query->whereHas('category', function ($q) {
-                $q->where('service_type', 'external');
-            }),
-            default => $query,
-        };
+        $query = $this->applyOrganizationScope($this->selectedOrganizationId);
 
         $data = $query
             ->selectRaw('client_type, COUNT(*) as count')
             ->groupBy('client_type')
             ->pluck('count', 'client_type')
             ->toArray();
-        // dd($data);
+
         return [
             'datasets' => [
                 [

@@ -2,19 +2,23 @@
 
 namespace App\Filament\Clusters\Feedbacks\Widgets;
 
-use App\Models\Feedback;
+use App\Enums\Feedback as EnumsFeedback;
+use App\Filament\Clusters\Feedbacks\Widgets\Concerns\FeedbackScopes;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
 use Livewire\Attributes\Reactive;
 
 class GenderChart extends ChartWidget
 {
+    use FeedbackScopes;
 
     #[Reactive]
     public ?string $selectedOrganizationId = null;
 
     protected static string $color = 'primary';
+
     protected static ?string $heading = 'Sex';
+
     protected static ?string $maxHeight = '400px';
 
     protected function getType(): string
@@ -24,21 +28,7 @@ class GenderChart extends ChartWidget
 
     protected function getData(): array
     {
-        $query = Feedback::query();
-
-        if ($this->selectedOrganizationId) {
-            $query->where('organization_id', $this->selectedOrganizationId);
-        }
-
-        $data = match($this->filter) {
-            'internal' => $query->whereHas('category', function($q) {
-                $q->where('service_type', 'internal');
-            }),
-            'external' => $query->whereHas('category', function ($q) {
-                $q->where('service_type', 'external');
-            }),
-            default => $query,
-        };
+        $query = $this->applyOrganizationScope($this->selectedOrganizationId);
 
         $data = $query
             ->selectRaw('gender, COUNT(*) as count')
@@ -139,8 +129,6 @@ class GenderChart extends ChartWidget
     {
         return [
             'overall' => 'Overall',
-            'internal' => 'Internal',
-            'external' => 'External'
-        ];
+            ] + EnumsFeedback::serviceTypesLabel();
     }
 }

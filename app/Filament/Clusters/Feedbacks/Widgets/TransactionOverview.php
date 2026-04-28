@@ -3,6 +3,7 @@
 namespace App\Filament\Clusters\Feedbacks\Widgets;
 
 use App\Enums\UserRole;
+use App\Filament\Clusters\Feedbacks\Resources\CategoryResource\Pages\ListCategories;
 use App\Models\Feedback;
 use App\Models\Request;
 use App\Models\Transaction;
@@ -10,20 +11,22 @@ use Filament\Facades\Filament;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\Auth;
-use Filament\Pages\Concerns\InteractsWithHeaderActions;
-use Livewire\Attributes\Reactive;
+use Filament\Widgets\Concerns\InteractsWithPageTable;
 
 class TransactionOverview extends BaseWidget
 {
+    use InteractsWithPageTable;
 
-    #[Reactive]
-    public ?string $selectedOrganizationId = null;
+    protected function getTablePage(): string
+    {
+        return ListCategories::class;
+    }
 
     protected function getStats(): array
     {
         $panelID = Filament::getCurrentPanel()->getId();
 
-        $selectedOrganizationId = $this->selectedOrganizationId;
+        $selectedOrganizationId = $this->tableFilters['organization_id']['value'] ?? null;
 
         return [
             Stat::make('Total Transaction', $this->getTotalTransactions($selectedOrganizationId, $panelID))
@@ -37,13 +40,13 @@ class TransactionOverview extends BaseWidget
             Stat::make('Total Not Surveyed', $this->getTotalNotSurveyed($selectedOrganizationId, $panelID))
                 ->description('Total number of transactions that have not been surveyed.')
                 ->color('danger'),
-            Stat::make('Percentage', $this->getPercentage($this->getTotalSurveyed($selectedOrganizationId, $panelID), $this->getTotalTransactions($this->selectedOrganizationId, $panelID)))
+            Stat::make('Percentage', $this->getPercentage($this->getTotalSurveyed($selectedOrganizationId, $panelID), $this->getTotalTransactions($selectedOrganizationId, $panelID)))
                 ->description('Percentage of transactions that have been surveyed.')
                 ->color('zinc'),
         ];
     }
 
-    public function totalTransactionsChart() : array {
+    private function totalTransactionsChart() : array {
         return Request::where('organization_id', Auth::user()->organization_id)
             ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as date, COUNT(*) as count')
             ->groupBy('date')
@@ -53,7 +56,7 @@ class TransactionOverview extends BaseWidget
             ->toArray();
     }
 
-    public function totalSurveyedChart() : array {
+    private function totalSurveyedChart() : array {
         return Feedback::where('organization_id', Auth::user()->organization_id)
             ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as date, COUNT(*) as count')
             ->groupBy('date')
