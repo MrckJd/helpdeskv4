@@ -12,6 +12,7 @@ class SelectAction extends Action
 {
     use HasSelect;
 
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,6 +38,8 @@ class SelectAction extends Action
 
         $this->action(function ($arguments, $livewire) {
             $livewire->selectedOrganizationId = $arguments['value'] === 'all' ? null : $arguments['value'];
+
+            $livewire->resetTable();
         });
     }
 
