@@ -12,6 +12,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Number;
 use Livewire\Attributes\Reactive;
+use Livewire\Livewire;
 
 class OverviewStatsWidget extends StatsOverviewWidget
 {
@@ -26,19 +27,19 @@ class OverviewStatsWidget extends StatsOverviewWidget
 
         return [
             Stat::make('CC Awareness', $this->getAwareness($panelID))
-                ->description('Total number of feedback received.')
+                ->description('Percentage of respondents aware of the service.')
                 ->color('primary'),
             Stat::make('CC Visibilty', $this->getVisibility($panelID))
-                ->description('Number of positive feedback received.')
+                ->description('Percentage of respondents who have used the service.')
                 ->color('success'),
             Stat::make('CC Helpfulness', $this->getHelpfulness($panelID))
-                ->description('Number of negative feedback received.')
+                ->description('Percentage of respondents who found the service helpful.')
                 ->color('danger'),
             Stat::make('Response Rate', $this->getResponseRate($panelID))
-                ->description('Number of neutral feedback received.')
+                ->description('Percentage of customers who provided feedback out of total transactions.')
                 ->color('warning'),
-            Stat::make('Overall Score', 4.5)
-                ->description('Average rating from feedback.')
+            Stat::make('Overall Score', $this->getOverallScore($panelID))
+                ->description('Overall customer satisfaction score based on feedback responses.')
                 ->color('zinc')
                 ->extraAttributes(['class' => 'col-span-1 max-sm:col-span-2']),
         ];
@@ -123,9 +124,64 @@ class OverviewStatsWidget extends StatsOverviewWidget
 
     protected function getOverallScore(string $panelID) : string
     {
-        $averageScore = Response::where('question', 'CC4')->avg('answer');
+        $positiveResponses = Response::where('answer','>=', 4)->where('question','not like', 'CC%')->where('question', '!=', 'SQD0')->count();
 
-        return Number::format($averageScore, 1);
+        $totalRespondents = function() use ($panelID) {
+            $query = Feedback::query();
+
+            if ($panelID === UserRole::ADMIN->value){
+                $query->where('organization_id', request()->user()->organization_id);
+            }
+
+            if($this->selectedOrganizationId) {
+                $query->where('organization_id', $this->selectedOrganizationId);
+            }
+
+            return $query->count();
+        };
+
+        $totalNoReponse = function() use ($panelID) {
+            $query = Response::query()->where('question', 'not like', 'CC%')->where('question', '!=', 'SQD0')->where('answer', 0);
+
+            if ($panelID === UserRole::ADMIN->value){
+                $query->whereHas('feedback', function ($q) {
+                    $q->where('organization_id', request()->user()->organization_id);
+                });
+            }
+
+            if($this->selectedOrganizationId) {
+                $query->whereHas('feedback', function ($q) use ($panelID) {
+                    $q->where('organization_id', $this->selectedOrganizationId);
+                });
+            }
+
+            return $query->count();
+        };
+
+        $positiveResponses = function() use ($panelID) {
+            $query = Response::query()->where('answer','>=', 4)->where('question','not like', 'CC%')->where('question', '!=', 'SQD0');
+
+            if ($panelID === UserRole::ADMIN->value){
+                $query->whereHas('feedback', function ($q) {
+                    $q->where('organization_id', request()->user()->organization_id);
+                });
+            }
+
+            if($this->selectedOrganizationId) {
+                $query->whereHas('feedback', function ($q) use ($panelID) {
+                    $q->where('organization_id', $this->selectedOrganizationId);
+                });
+            }
+
+            return $query->count();
+        };
+        try{
+            $totalScore = (($positiveResponses()) / (($totalRespondents()*8) - $totalNoReponse()) * 100);
+            return Number::percentage($totalScore, 1);
+        } catch (\DivisionByZeroError $e) {
+            return '0.0%';
+        }
+
     }
 
     private function responsePartCountScope(?string $selectedOrganizationId, string $panelID): Builder
@@ -162,7 +218,5 @@ class OverviewStatsWidget extends StatsOverviewWidget
 
         return $totalCountQuery;
     }
-
-
 
 }
