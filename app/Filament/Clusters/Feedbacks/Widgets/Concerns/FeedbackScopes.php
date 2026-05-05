@@ -16,10 +16,6 @@ trait FeedbackScopes
             $query->where('organization_id', $organizationId);
         }
 
-        if ($this->selectedOrganizationId) {
-            $query->where('organization_id', $this->selectedOrganizationId);
-        }
-
         if(request()->user()->role === UserRole::ADMIN){
             $query->where('organization_id', request()->user()->organization_id);
         }

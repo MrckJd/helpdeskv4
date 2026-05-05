@@ -95,28 +95,53 @@ class OverviewStatsWidget extends StatsOverviewWidget
 
     protected function getResponseRate(string $panelID) : string
     {
-        $totalTransactions = Transaction::sum('total_transactions');
-        $totalResponses = Feedback::count();
+        $transactionQuery = Transaction::query();
+        $feedbackQuery = Feedback::query();
 
-        return  Number::percentage(($totalResponses / $totalTransactions) * 100, 1);
+        try{
+            if ($panelID === UserRole::ADMIN->value){
+                $transactionQuery->where('organization_id', request()->user()->organization_id);
+                $feedbackQuery->where('organization_id', request()->user()->organization_id);
+            }
+
+            if($this->selectedOrganizationId) {
+                $transactionQuery->where('organization_id', $this->selectedOrganizationId);
+                $feedbackQuery->where('organization_id', $this->selectedOrganizationId);
+            }
+
+                $totalTransactionsCount = $transactionQuery->sum('total_transactions');
+                $totalFeedbacksCount = $feedbackQuery->count();
+
+            return Number::percentage(($totalFeedbacksCount / $totalTransactionsCount) * 100, 1);
+
+        }catch (\DivisionByZeroError $e){
+            return '0.0%';
+        }
+
+
+    }
+
+    protected function getOverallScore(string $panelID) : string
+    {
+        $averageScore = Response::where('question', 'CC4')->avg('answer');
+
+        return Number::format($averageScore, 1);
     }
 
     private function responsePartCountScope(?string $selectedOrganizationId, string $panelID): Builder
-    {       $partCountQuery = Response::query();
-
-            if ($panelID === UserRole::ADMIN->value){
-                $partCountQuery->whereHas('feedback', function ($query){
-                    $query->where('organization_id', request()->user()->organization_id);
-                });
-            }
-
-            if($selectedOrganizationId) {
-                $partCountQuery->whereHas('feedback', function ($query) use ($selectedOrganizationId) {
-                    $query->where('organization_id', $selectedOrganizationId);
-                });
-            }
-
-            return $partCountQuery;
+    {
+        $partCountQuery = Response::query();
+        if ($panelID === UserRole::ADMIN->value){
+            $partCountQuery->whereHas('feedback', function ($query){
+                $query->where('organization_id', request()->user()->organization_id);
+            });
+        }
+        if($selectedOrganizationId) {
+            $partCountQuery->whereHas('feedback', function ($query) use ($selectedOrganizationId) {
+                $query->where('organization_id', $selectedOrganizationId);
+            });
+        }
+        return $partCountQuery;
     }
 
     private function responseTotalCountScope(?string $selectedOrganizationId, string $panelID): Builder

@@ -4,6 +4,7 @@ namespace App\Filament\Clusters\Feedbacks\Pages;
 
 use App\Enums\Feedback;
 use App\Enums\SqdQuestion;
+use App\Enums\UserRole;
 use App\Filament\Actions\Header\SelectAction;
 use App\Filament\Clusters\Feedbacks;
 use App\Filament\Clusters\Feedbacks\Widgets\AgeChartWidget;
@@ -50,12 +51,18 @@ class Dashboard extends Page implements HasForms, HasTable
     {
         $query = Response::query();
 
-        if(!is_null($this->selectedOrganizationId)){
+        if(!is_null($this->selectedOrganizationId) && request()->user()->role != UserRole::ADMIN){
             $query->whereHas('feedback', function ($q) {
                 $q->where('organization_id', $this->selectedOrganizationId);
             });
         }else{
             $query = Response::query();
+        }
+
+        if(request()->user()->role === UserRole::ADMIN) {
+            $query->whereHas('feedback', function ($q) {
+                $q->where('organization_id', request()->user()->organization_id);
+            });
         }
 
         $query = $query->select('question')
@@ -70,7 +77,7 @@ class Dashboard extends Page implements HasForms, HasTable
             ->where('question', 'not like', 'CC%')
             ->where('question', '!=', 'SQD0')
             ->groupBy('question')
-            ->orderBy('question');
+            ->orderBy('question', 'asc');
 
         return $query;
     }
@@ -185,12 +192,12 @@ class Dashboard extends Page implements HasForms, HasTable
         return [
             GenderChart::make([
                 'selectedOrganizationId' => $this->selectedOrganizationId,
-                ]),
+            ]),
             CustomerTypeWidget::make([
-                    'selectedOrganizationId' => $this->selectedOrganizationId,
-                    ]),
+                'selectedOrganizationId' => $this->selectedOrganizationId,
+            ]),
             AgeChartWidget::make([
-                    'selectedOrganizationId' => $this->selectedOrganizationId,
+                'selectedOrganizationId' => $this->selectedOrganizationId,
             ]),
         ];
     }
