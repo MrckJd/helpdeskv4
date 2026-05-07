@@ -11,6 +11,7 @@ use App\Filament\Clusters\Feedbacks\Widgets\AgeChartWidget;
 use App\Filament\Clusters\Feedbacks\Widgets\CustomerTypeWidget;
 use App\Filament\Clusters\Feedbacks\Widgets\GenderChart;
 use App\Filament\Clusters\Feedbacks\Widgets\OverviewStatsWidget;
+use App\Filament\Clusters\Feedbacks\Widgets\RegionChartWidget;
 use App\Models\Response;
 use Filament\Actions\Action;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -197,6 +198,9 @@ class Dashboard extends Page implements HasForms, HasTable
                 'selectedOrganizationId' => $this->selectedOrganizationId,
             ]),
             AgeChartWidget::make([
+                'selectedOrganizationId' => $this->selectedOrganizationId,
+            ]),
+            RegionChartWidget::make([
                 'selectedOrganizationId' => $this->selectedOrganizationId,
             ]),
         ];

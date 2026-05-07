@@ -79,7 +79,6 @@ class TransactionOverview extends BaseWidget
             return Transaction::sum('total_transactions');
         }else{
             return Transaction::where('organization_id', $organizationId)->sum('total_transactions');
-
         }
 
         return 0;

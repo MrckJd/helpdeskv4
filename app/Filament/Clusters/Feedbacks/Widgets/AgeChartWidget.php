@@ -16,6 +16,7 @@ class AgeChartWidget extends ChartWidget
 
     protected static ?string $heading = 'Age Distribution';
 
+    protected static string $color = 'info';
 
     protected function getType(): string
     {
