@@ -12,12 +12,12 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Livewire\Attributes\Reactive;
 
-use function PHPUnit\Framework\isNull;
-
 class RegionChartWidget extends TableWidget
 {
     #[Reactive]
     public ?string $selectedOrganizationId = null;
+
+    protected static bool $isLazy = false;
 
     protected static ?string $heading = 'Region';
 
@@ -66,8 +66,4 @@ class RegionChartWidget extends TableWidget
     {
         return $record->region;
     }
-
-
-
-
 }

@@ -12,6 +12,7 @@ use App\Filament\Clusters\Feedbacks\Widgets\CustomerTypeWidget;
 use App\Filament\Clusters\Feedbacks\Widgets\GenderChart;
 use App\Filament\Clusters\Feedbacks\Widgets\OverviewStatsWidget;
 use App\Filament\Clusters\Feedbacks\Widgets\RegionChartWidget;
+use App\Filament\Clusters\Feedbacks\Widgets\SQD0Widget;
 use App\Models\Response;
 use Filament\Actions\Action;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -25,9 +26,6 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
-use Livewire\Attributes\Reactive;
 use Livewire\Attributes\Url;
 
 class Dashboard extends Page implements HasForms, HasTable
@@ -183,6 +181,9 @@ class Dashboard extends Page implements HasForms, HasTable
     {
         return [
             OverviewStatsWidget::make([
+                'selectedOrganizationId' => $this->selectedOrganizationId,
+            ]),
+            SQD0Widget::make([
                 'selectedOrganizationId' => $this->selectedOrganizationId,
             ]),
             ];

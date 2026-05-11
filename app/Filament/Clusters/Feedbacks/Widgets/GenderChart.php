@@ -21,6 +21,8 @@ class GenderChart extends ChartWidget
 
     protected static ?string $maxHeight = '400px';
 
+    protected static bool $isLazy = false;
+
     protected function getType(): string
     {
         return 'pie';

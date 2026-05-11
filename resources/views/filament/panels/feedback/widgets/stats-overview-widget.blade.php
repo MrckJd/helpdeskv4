@@ -32,7 +32,7 @@
                 wire:poll.{{ $pollingInterval }}
             @endif
             @class([
-                'fi-wi-stats-overview-stats-ctn grid gap-6 grid-cols-2 xl:grid-cols-5',
+                'fi-wi-stats-overview-stats-ctn grid gap-6 grid-cols-2 lg:grid-cols-5',
             ])
         >
             @foreach ($this->getCachedStats() as $stat)

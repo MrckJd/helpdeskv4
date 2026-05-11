@@ -18,6 +18,8 @@ class AgeChartWidget extends ChartWidget
 
     protected static string $color = 'info';
 
+    protected static bool $isLazy = false;
+
     protected function getType(): string
     {
         return 'bar';
