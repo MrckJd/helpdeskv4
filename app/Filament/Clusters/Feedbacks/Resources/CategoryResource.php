@@ -4,7 +4,9 @@ namespace App\Filament\Clusters\Feedbacks\Resources;
 
 use App\Filament\Clusters\Feedbacks;
 use App\Filament\Clusters\Feedbacks\Resources\CategoryResource\Pages;
+use App\Filament\Clusters\Feedbacks\Widgets\TransactionOverview;
 use App\Models\Category;
+use App\Models\Transaction;
 use Filament\Facades\Filament;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -65,6 +67,13 @@ class CategoryResource extends Resource
             ]);
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            TransactionOverview::class,
+        ];
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
@@ -86,10 +95,4 @@ class CategoryResource extends Resource
         ];
     }
 
-    public static function getWidgets(): array
-    {
-        return [
-            CategoryResource\Widgets\TransactionOverview::class,
-        ];
-    }
 }

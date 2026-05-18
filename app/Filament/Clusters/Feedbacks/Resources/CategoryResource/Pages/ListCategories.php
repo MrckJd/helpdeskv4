@@ -5,6 +5,8 @@ namespace App\Filament\Clusters\Feedbacks\Resources\CategoryResource\Pages;
 use App\Filament\Actions\SyncTransactions;
 use App\Filament\Actions\TallyTransactionsAction;
 use App\Filament\Clusters\Feedbacks\Resources\CategoryResource;
+use App\Filament\Clusters\Feedbacks\Widgets\TransactionOverview;
+use App\Models\Transaction;
 use Filament\Pages\Concerns\ExposesTableToWidgets;
 use Filament\Resources\Pages\ListRecords;
 
@@ -25,8 +27,9 @@ class ListCategories extends ListRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            CategoryResource\Widgets\TransactionOverview::class,
+            TransactionOverview::class,
         ];
     }
+
 
 }
