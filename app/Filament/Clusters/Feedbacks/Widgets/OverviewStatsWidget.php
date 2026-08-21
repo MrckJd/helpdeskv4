@@ -23,6 +23,9 @@ class OverviewStatsWidget extends StatsOverviewWidget
     #[Reactive]
     public ?string $selectedOrganizationId = null;
 
+    #[Reactive]
+    public ?string $selectedCategoryId = null;
+
     protected static string $view = 'filament.panels.feedback.widgets.stats-overview-widget';
 
     protected function getStats(): array
@@ -69,8 +72,8 @@ class OverviewStatsWidget extends StatsOverviewWidget
     {
         try{
             $partCount = $this->responsePartCountScope($this->selectedOrganizationId, $panelID)
-                          ->where('question', 'CC2')
-                          ->where('answer', 1)->count();
+                                ->where('question', 'CC2')
+                                ->where('answer', 1)->count();
             $totalCount = $this->responseTotalCountScope($this->selectedOrganizationId, $panelID)
                                ->where('question', 'CC2')
                                ->count();
@@ -85,8 +88,8 @@ class OverviewStatsWidget extends StatsOverviewWidget
     {
         try{
             $partCount = $this->responsePartCountScope($this->selectedOrganizationId, $panelID)
-                          ->where('question', 'CC3')
-                          ->where('answer', 1)->count();
+                                ->where('question', 'CC3')
+                                ->where('answer', 1)->count();
             $totalCount = $this->responseTotalCountScope($this->selectedOrganizationId, $panelID)
                                ->where('question', 'CC3')
                                ->count();
@@ -105,13 +108,17 @@ class OverviewStatsWidget extends StatsOverviewWidget
 
         try{
             if ($panelID === UserRole::ADMIN->value){
-                $transactionQuery->where('organization_id', request()->user()->organization_id);
-                $feedbackQuery->where('organization_id', request()->user()->organization_id);
+                $transactionQuery->where('organization_id', request()->user()->organization_id)
+                                 ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
+                $feedbackQuery->where('organization_id', request()->user()->organization_id)
+                              ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
             }
 
             if($this->selectedOrganizationId) {
-                $transactionQuery->where('organization_id', $this->selectedOrganizationId);
-                $feedbackQuery->where('organization_id', $this->selectedOrganizationId);
+                $transactionQuery->where('organization_id', $this->selectedOrganizationId)
+                                 ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
+                $feedbackQuery->where('organization_id', $this->selectedOrganizationId)
+                              ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
             }
 
                 $totalTransactionsCount = $transactionQuery->sum('total_transactions');
@@ -191,12 +198,14 @@ class OverviewStatsWidget extends StatsOverviewWidget
         $partCountQuery = Response::query();
         if ($panelID === UserRole::ADMIN->value){
             $partCountQuery->whereHas('feedback', function ($query){
-                $query->where('organization_id', request()->user()->organization_id);
+                $query->where('organization_id', request()->user()->organization_id)
+                    ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
             });
         }
         if($selectedOrganizationId) {
             $partCountQuery->whereHas('feedback', function ($query) use ($selectedOrganizationId) {
-                $query->where('organization_id', $selectedOrganizationId);
+                $query->where('organization_id', $selectedOrganizationId)
+                    ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
             });
         }
         return $this->applyPageFiltersToResponseQuery($partCountQuery);
@@ -208,13 +217,15 @@ class OverviewStatsWidget extends StatsOverviewWidget
 
         if ($panelID === UserRole::ADMIN->value){
             $totalCountQuery->whereHas('feedback', function ($query){
-                $query->where('organization_id', request()->user()->organization_id);
+                $query->where('organization_id', request()->user()->organization_id)
+                        ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
             });
         }
 
         if($selectedOrganizationId) {
             $totalCountQuery->whereHas('feedback', function ($query) use ($selectedOrganizationId) {
-                $query->where('organization_id', $selectedOrganizationId);
+                $query->where('organization_id', $selectedOrganizationId)
+                    ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
             });
         }
 
