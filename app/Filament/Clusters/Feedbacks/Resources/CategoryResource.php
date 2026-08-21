@@ -63,7 +63,10 @@ class CategoryResource extends Resource
                    ->label('Organization')
                    ->searchable()
                    ->options(fn () => \App\Models\Organization::pluck('code', 'id'))
-                   ->hidden(fn() => !in_array(Filament::getCurrentPanel()->getId(), ['root', 'auditor']))
+                   ->hidden(fn() => !in_array(Filament::getCurrentPanel()->getId(), ['root', 'auditor'])),
+                SelectFilter::make('service_type')
+                    ->label('Service Type')
+                    ->options(fn () => \App\Enums\Feedback::serviceTypesLabel()),
             ]);
     }
 

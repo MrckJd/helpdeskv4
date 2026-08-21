@@ -20,16 +20,6 @@ trait FeedbackScopes
             $query->where('organization_id', request()->user()->organization_id);
         }
 
-        $query = match($this->filter ?? null) {
-            'internal' => $query->whereHas('category', function($q) {
-                $q->where('service_type', 'internal');
-            }),
-            'external' => $query->whereHas('category', function ($q) {
-                $q->where('service_type', 'external');
-            }),
-            default => $query,
-        };
-
         return $this->applyPageFilters($query);
     }
 
@@ -41,7 +31,7 @@ trait FeedbackScopes
             ->when($filters['startDate'] ?? null, fn (Builder $q, $date) => $q->whereDate('created_at', '>=', $date))
             ->when($filters['endDate'] ?? null, fn (Builder $q, $date) => $q->whereDate('created_at', '<=', $date))
             ->when($filters['category_id'] ?? null, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId))
-            ->when($filters['']);
+            ->when($filters['service_type'] ?? null, fn (Builder $q, $serviceTypeId) => $q->whereHas('category', fn (Builder $q) => $q->where('service_type', $serviceTypeId)));
     }
 
     protected function applyPageFiltersToResponseQuery(Builder $query): Builder
@@ -55,7 +45,8 @@ trait FeedbackScopes
         return $query->whereHas('feedback', function (Builder $q) use ($filters) {
             $q->when($filters['startDate'] ?? null, fn (Builder $q, $date) => $q->whereDate('created_at', '>=', $date))
                 ->when($filters['endDate'] ?? null, fn (Builder $q, $date) => $q->whereDate('created_at', '<=', $date))
-                ->when($filters['category_id'] ?? null, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
+                ->when($filters['category_id'] ?? null, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId))
+                ->when($filters['service_type'] ?? null, fn (Builder $q, $serviceTypeId) => $q->where('service_type', $serviceTypeId));
         });
     }
 }
