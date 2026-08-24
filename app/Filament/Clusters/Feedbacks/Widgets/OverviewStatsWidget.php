@@ -103,34 +103,33 @@ class OverviewStatsWidget extends StatsOverviewWidget
 
     protected function getResponseRate(string $panelID) : string
     {
-        $transactionQuery = Transaction::query();
-        $feedbackQuery = Feedback::query();
+        $filters = $this->filters ?? [];
 
-        try{
-            if ($panelID === UserRole::ADMIN->value){
-                $transactionQuery->where('organization_id', request()->user()->organization_id)
-                                 ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
-                $feedbackQuery->where('organization_id', request()->user()->organization_id)
-                              ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
-            }
+        $organizationId = ($panelID === UserRole::ADMIN->value)
+            ? request()->user()->organization_id
+            : ($this->selectedOrganizationId ?? null);
 
-            if($this->selectedOrganizationId) {
-                $transactionQuery->where('organization_id', $this->selectedOrganizationId)
-                                 ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
-                $feedbackQuery->where('organization_id', $this->selectedOrganizationId)
-                              ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
-            }
+        try {
+            $transactionQuery = Transaction::query()
+                ->when($panelID === UserRole::ADMIN->value, fn (Builder $q) => $q->where('organization_id', request()->user()->organization_id))
+                ->when($organizationId && $panelID !== UserRole::ADMIN->value, fn (Builder $q) => $q->where('organization_id', $organizationId))
+                ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId))
+                ->when($filters['service_type'] ?? null, fn (Builder $q, $serviceType) => $q->whereHas('category', fn (Builder $q) => $q->where('service_type', $serviceType)))
+                ->when($filters['startDate'] ?? null, fn (Builder $q, $date) => $q->whereDate('date', '>=', $date))
+                ->when($filters['endDate'] ?? null, fn (Builder $q, $date) => $q->whereDate('date', '<=', $date));
 
-                $totalTransactionsCount = $transactionQuery->sum('total_transactions');
-                $totalFeedbacksCount = $this->applyPageFilters($feedbackQuery)->count();
+            $feedbackQuery = Feedback::query()
+                ->when($panelID === UserRole::ADMIN->value, fn (Builder $q) => $q->where('organization_id', request()->user()->organization_id))
+                ->when($organizationId && $panelID !== UserRole::ADMIN->value, fn (Builder $q) => $q->where('organization_id', $organizationId))
+                ->when($this->selectedCategoryId, fn (Builder $q, $categoryId) => $q->where('category_id', $categoryId));
+
+            $totalTransactionsCount = $transactionQuery->sum('total_transactions');
+            $totalFeedbacksCount = $this->applyPageFilters($feedbackQuery)->count();
 
             return Number::percentage(($totalFeedbacksCount / $totalTransactionsCount) * 100, 1);
-
-        }catch (\DivisionByZeroError $e){
+        } catch (\DivisionByZeroError $e) {
             return '0.0%';
         }
-
-
     }
 
     protected function getOverallScore(string $panelID) : string

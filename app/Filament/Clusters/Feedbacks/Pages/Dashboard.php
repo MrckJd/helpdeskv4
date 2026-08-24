@@ -263,16 +263,16 @@ class Dashboard extends Page implements HasForms, HasTable
     {
         return [
             GenderChart::make([
-                'selectedOrganizationId' => $this->selectedOrganizationId,
+                'selectedOrganizationId' => $this->filters['organization_id'] ?? null,
             ]),
             CustomerTypeWidget::make([
-                'selectedOrganizationId' => $this->selectedOrganizationId,
+                'selectedOrganizationId' => $this->filters['organization_id'] ?? null,
             ]),
             AgeChartWidget::make([
-                'selectedOrganizationId' => $this->selectedOrganizationId,
+                'selectedOrganizationId' => $this->filters['organization_id'] ?? null,
             ]),
             RegionChartWidget::make([
-                'selectedOrganizationId' => $this->selectedOrganizationId,
+                'selectedOrganizationId' => $this->filters['organization_id'] ?? null,
             ]),
         ];
     }
