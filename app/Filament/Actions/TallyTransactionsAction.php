@@ -53,17 +53,45 @@ class TallyTransactionsAction extends Action
         ]);
 
         $this->action(function ($data): void {
-            try{
+            try {
+                $organizationId = Filament::auth()->user()->organization_id;
 
+                // --- Duplicate detection ---
+                $duplicates = [];
+
+                foreach ($data['transactions'] as $transactionData) {
+                    $exists = Transaction::query()
+                        ->where('organization_id', $organizationId)
+                        ->where('category_id', $transactionData['category_id'])
+                        ->whereDate('date', $transactionData['date'])
+                        ->exists();
+
+                    if ($exists) {
+                        $categoryName = Category::find($transactionData['category_id'])?->name ?? $transactionData['category_id'];
+                        $duplicates[] = "{$categoryName} on {$transactionData['date']}";
+                    }
+                }
+
+                if (!empty($duplicates)) {
+                    Notification::make()
+                        ->title('Duplicate transaction(s) detected')
+                        ->body('The following entries already exist and were not saved: ' . implode(', ', $duplicates))
+                        ->danger()
+                        ->send();
+
+                    return;
+                }
+
+                // --- Save ---
                 $this->beginDatabaseTransaction();
 
                 foreach ($data['transactions'] as $transactionData) {
                     Transaction::create([
-                        'category_id' => $transactionData['category_id'],
-                        'organization_id' => Filament::auth()->user()->organization_id,
+                        'category_id'        => $transactionData['category_id'],
+                        'organization_id'    => $organizationId,
                         'total_transactions' => $transactionData['total_transactions'],
-                        'date' => $transactionData['date'],
-                        'user_id' => Filament::auth()->id(),
+                        'date'               => $transactionData['date'],
+                        'user_id'            => Filament::auth()->id(),
                     ]);
                 }
 

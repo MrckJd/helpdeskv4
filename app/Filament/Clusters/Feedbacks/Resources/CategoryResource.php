@@ -5,6 +5,7 @@ namespace App\Filament\Clusters\Feedbacks\Resources;
 use App\Filament\Clusters\Feedbacks;
 use App\Filament\Clusters\Feedbacks\Resources\CategoryResource\Pages;
 use App\Filament\Clusters\Feedbacks\Widgets\TransactionOverview;
+use App\Filament\Actions\Tables\EditTransactionsAction;
 use App\Models\Category;
 use App\Models\Transaction;
 use Filament\Facades\Filament;
@@ -12,6 +13,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -59,7 +61,12 @@ class CategoryResource extends Resource
                     ->sortable()
                     ->default(0),
             ])
-            ->recordUrl( fn (Category $record) => static::getUrl('ListFeedbacks', ['record' => $record]))
+            ->recordUrl(fn (Category $record) => static::getUrl('ListFeedbacks', ['record' => $record]))
+            ->actions([
+                ActionGroup::make([
+                    EditTransactionsAction::make(),
+                ]),
+            ])
             ->filters([
                 SelectFilter::make('organization_id')
                    ->label('Organization')
